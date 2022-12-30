@@ -1,0 +1,18 @@
+modLoader="javafml"
+loaderVersion="[40,)"
+license="GNU LGPLv3"
+issueTrackerURL="https://github.com/Flemmli97/DebugUtils/issues"
+[[mods]]
+modId="debugutils"
+version="${version}"
+displayName="Debug Utils"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/debug-utils-forge"
+logoFile="icon.png"
+authors="Flemmli97"
+description='''Enables various debugging tools from mojang'''
+[[dependencies.debugutils]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.18.2,)"
+ordering="NONE"
+side="BOTH"
