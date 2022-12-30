@@ -1,90 +1,104 @@
 plugins {
+    id 'net.minecraftforge.gradle' version '5.1.+'
     id "com.github.johnrengelman.shadow" version "7.1.0"
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
-architectury {
-    platformSetupLoomIde()
-    forge()
-}
+minecraft {
+    mappings channel: 'parchment', version: parchment_version + "-" + minecraft_version
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    runs {
+        client {
+            arg "-mixin.config=" + modid + ".mixins.json"
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            jvmArgs "-Dmixin.debug.export=true"
+            mods {
+                modClientRun {
+                    source sourceSets.main
+                    source project(":common").sourceSets.main
+                }
+            }
+        }
 
-loom {
-    forge {
-        mixinConfigs = ["debug_utils.mixins.json"]
-        runs {
-            client {
-                vmArgs "-Dmixin.debug.export=true"
+        server {
+            arg "-mixin.config=" + modid + ".mixins.json"
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            jvmArgs "-Dmixin.debug.export=true"
+            mods {
+                modServerRun {
+                    source sourceSets.main
+                    source project(":common").sourceSets.main
+                }
+            }
+        }
+
+        data {
+            arg "-mixin.config=" + modid + ".mixins.json"
+            args '--mod', modid, '--all', '--output', project(":common").file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                modDataRun {
+                    source sourceSets.main
+                    source project(":common").sourceSets.main
+                }
             }
         }
     }
 }
 
-configurations {
-    common
-    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
-    compileClasspath.extendsFrom common
-    runtimeClasspath.extendsFrom common
-    developmentForge.extendsFrom common
-}
-
 dependencies {
-    forge "net.minecraftforge:forge:${rootProject.forge_version}"
-
-    common(project(path: ":common", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
+    minecraft "net.minecraftforge:forge:${forge_version}"
+    compileOnly project(":common")
 }
 
 processResources {
-    inputs.property "version", project.version
+    from project(":common").sourceSets.main.resources
+    def ver = project.version.replace("-${project.name}", "")
+    inputs.property "version", ver
+
+    exclude "*.accesswidener"
 
     filesMatching("META-INF/mods.toml") {
-        expand "version": project.version
+        expand "version": ver
     }
 }
 
-shadowJar {
-    exclude "fabric.mod.json"
-
-    configurations = [project.configurations.shadowCommon]
-    classifier "dev-shadow"
-}
-
-remapJar {
-    input.set shadowJar.archiveFile
-    dependsOn shadowJar
-    classifier "forge"
+tasks.withType(JavaCompile) {
+    source(project(":common").sourceSets.main.allSource)
 }
 
 jar {
-    classifier "dev"
+    manifest {
+        attributes("MixinConfigs": "${modid}.mixins.json")
+    }
 }
+
+jar.finalizedBy('reobfJar')
 
 sourcesJar {
     def commonSources = project(":common").sourcesJar
     dependsOn commonSources
     from commonSources.archiveFile.map { zipTree(it) }
-    classifier "forge-sources"
-}
-
-components.java {
-    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
-        skip()
-    }
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
             // add all the jars that should be included when publishing to maven
-            artifact(remapJar) {
-                classifier null
-                builtBy remapJar
+            artifact(jar) {
+                builtBy jar
             }
             artifact(sourcesJar) {
-                classifier "sources"
-                builtBy remapSourcesJar
+                builtBy sourcesJar
             }
-            artifactId project.archives_base_name
-            version project.version + "-forge"
+            artifact(javadocJar) {
+                builtBy javadocJar
+            }
+            artifactId project.archivesBaseName
+            version project.version
         }
     }
 

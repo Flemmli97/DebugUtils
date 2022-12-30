@@ -1,10 +1,7 @@
 plugins {
+    id 'fabric-loom' version '1.0-SNAPSHOT'
+    id 'idea'
     id "com.github.johnrengelman.shadow" version "7.1.0"
-}
-
-architectury {
-    platformSetupLoomIde()
-    fabric()
 }
 
 loom {
@@ -13,41 +10,37 @@ loom {
             vmArgs "-Dmixin.debug.export=true"
         }
     }
-}
-
-configurations {
-    common
-    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
-    compileClasspath.extendsFrom common
-    runtimeClasspath.extendsFrom common
-    developmentFabric.extendsFrom common
+    mixin {
+        useLegacyMixinAp = false
+    }
+    accessWidenerPath.set project(":common").file("src/main/resources/debugutils.accesswidener")
 }
 
 dependencies {
-    modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${minecraft_version}:${rootProject.parchment_version}@zip")
+    }
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}"
 
-    common(project(path: ":common", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
+    implementation project(path: ":common", configuration: "namedElements")
 }
 
 processResources {
-    inputs.property "version", project.version
+    from project(":common").sourceSets.main.resources
+    def ver = project.version.replace("-${project.name}", "")
+    inputs.property "version", ver
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        expand "version": ver
     }
+    exclude '.cache/**'
 }
 
-shadowJar {
-    configurations = [project.configurations.shadowCommon]
-    classifier "dev-shadow"
-}
-
-remapJar {
-    input.set shadowJar.archiveFile
-    dependsOn shadowJar
-    classifier "fabric"
+tasks.withType(JavaCompile) {
+    source(project(":common").sourceSets.main.allSource)
 }
 
 jar {
@@ -58,29 +51,22 @@ sourcesJar {
     def commonSources = project(":common").sourcesJar
     dependsOn commonSources
     from commonSources.archiveFile.map { zipTree(it) }
-    classifier "fabric-source"
-}
-
-components.java {
-    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
-        skip()
-    }
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            // add all the jars that should be included when publishing to maven
             artifact(remapJar) {
-                classifier null
                 builtBy remapJar
             }
-            artifact(sourcesJar) {
-                classifier "sources"
+            artifact(remapSourcesJar) {
                 builtBy remapSourcesJar
             }
-            artifactId project.archives_base_name
-            version project.version + "-fabric"
+            artifact(javadocJar) {
+                builtBy javadocJar
+            }
+            artifactId project.modid
+            version project.version
         }
     }
 

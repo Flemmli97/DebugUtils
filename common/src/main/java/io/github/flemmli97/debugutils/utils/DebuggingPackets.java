@@ -3,10 +3,12 @@ package io.github.flemmli97.debugutils.utils;
 import io.github.flemmli97.debugutils.DebugToggles;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.game.DebugPackets;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.entity.LivingEntity;
@@ -42,12 +44,12 @@ public class DebuggingPackets {
                     .forEach(p -> sendPoiAddedPacket(level, p.getPos(), p.getPoiType()));
     }
 
-    public static void sendPoiAddedPacket(ServerLevel level, BlockPos pos, PoiType type) {
+    public static void sendPoiAddedPacket(ServerLevel level, BlockPos pos, Holder<PoiType> type) {
         if (DebugToggles.DEBUG_POI.get() && !level.isClientSide) {
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeBlockPos(pos);
-            buf.writeUtf(type.getName());
-            buf.writeInt(type.getMaxTickets());
+            buf.writeUtf(type.unwrapKey().get().location().toString());
+            buf.writeInt(type.value().maxTickets());
             ClientboundCustomPayloadPacket packet = new ClientboundCustomPayloadPacket(ClientboundCustomPayloadPacket.DEBUG_POI_ADDED_PACKET, buf);
             sendToAll(packet, level);
         }
@@ -171,7 +173,7 @@ public class DebuggingPackets {
             buf.writeInt(entity.getId());
             buf.writeUtf(entity.getName().getString());
             if (entity instanceof Villager villager) {
-                buf.writeUtf(villager.getVillagerData().getProfession().getName());
+                buf.writeUtf(villager.getVillagerData().getProfession().name());
                 buf.writeInt(villager.getVillagerXp());
             } else {
                 buf.writeUtf("");
@@ -180,7 +182,7 @@ public class DebuggingPackets {
             buf.writeFloat(entity.getHealth());
             buf.writeFloat(entity.getMaxHealth());
 
-            BrainUtils.writeBrain(entity, buf);
+            DebugPackets.writeBrain(entity, buf);
             ClientboundCustomPayloadPacket packet = new ClientboundCustomPayloadPacket(ClientboundCustomPayloadPacket.DEBUG_BRAIN, buf);
             sendToAll(packet, (ServerLevel) entity.level);
         }
@@ -230,11 +232,13 @@ public class DebuggingPackets {
         }
     }
 
-    public static void sendGameEventInfo(Level level, GameEvent gameEvent, BlockPos pos) {
+    public static void sendGameEventInfo(Level level, GameEvent gameEvent, Vec3 pos) {
         if (DebugToggles.DEBUG_GAME_EVENT.get() && !level.isClientSide) {
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-            buf.writeResourceLocation(Registry.GAME_EVENT.getKey(gameEvent));
-            buf.writeBlockPos(pos);
+            buf.writeResourceLocation(BuiltInRegistries.GAME_EVENT.getKey(gameEvent));
+            buf.writeDouble(pos.x());
+            buf.writeDouble(pos.y());
+            buf.writeDouble(pos.z());
             ClientboundCustomPayloadPacket packet = new ClientboundCustomPayloadPacket(ClientboundCustomPayloadPacket.DEBUG_GAME_EVENT, buf);
             sendToAll(packet, (ServerLevel) level);
         }
@@ -254,7 +258,7 @@ public class DebuggingPackets {
         if (DebugToggles.DEBUG_BEE_HIVES.get() && !level.isClientSide) {
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             buf.writeBlockPos(pos);
-            buf.writeUtf(Registry.BLOCK_ENTITY_TYPE.getKey(hiveBlockEntity.getType()).toString());
+            buf.writeUtf(BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(hiveBlockEntity.getType()).toString());
             buf.writeInt(hiveBlockEntity.getOccupantCount());
             buf.writeInt(blockState.getValue(BeehiveBlock.HONEY_LEVEL));
             buf.writeBoolean(hiveBlockEntity.isSedated());

@@ -27,7 +27,7 @@ public class PathFinderMixin {
     @Shadow
     private BinaryHeap openSet;
 
-    @Inject(method = "findPath", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "findPath", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
     private void setPathDebugs(PathNavigationRegion region, Mob mob, Set<BlockPos> targetPositions, float maxRange, int accuracy, float searchDepthMultiplier, CallbackInfoReturnable<Path> info,
                                Node start, Map<Target, BlockPos> map) {
         ((PathAccessor) info.getReturnValue()).debugData(this.openSet.getHeap(), new Node[0], map.keySet());

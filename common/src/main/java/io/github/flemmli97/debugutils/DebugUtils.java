@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class DebugUtils {
 
-    public static final String MODID = "debug_utils";
+    public static final String MODID = "debugutils";
     public static final Logger LOGGER = LogManager.getLogger(MODID);
 
     @SuppressWarnings("unchecked")
