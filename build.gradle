@@ -203,7 +203,9 @@ afterEvaluate {
         dependsOn clean, ":fabric:build", ":fabric:publish", "curseforge${curse_id_fabric}"
         project("fabric").build.mustRunAfter clean
         project("fabric").publish.mustRunAfter ":fabric:build"
-        tasks.findByName("curseforge${curse_id_fabric}").mustRunAfter ":fabric:publish"
+        def t = tasks.findByName("curseforge${curse_id_fabric}") //Sometimes when project is not completly setup this can be null. But when run it shouldn't be
+        if(t != null)
+            t.mustRunAfter ":fabric:publish"
         doLast {
             discordNotif(true, false)
         }
@@ -213,7 +215,9 @@ afterEvaluate {
         dependsOn clean, ":forge:build", ":forge:publish", "curseforge${curse_id_forge}"
         project("forge").build.mustRunAfter clean
         project("forge").publish.mustRunAfter ":forge:build"
-        tasks.findByName("curseforge${curse_id_forge}").mustRunAfter ":forge:publish"
+        def t = tasks.findByName("curseforge${curse_id_forge}") //Sometimes when project is not completly setup this can be null. But when run it shouldn't be
+        if(t != null)
+            t.mustRunAfter ":forge:publish"
         doLast {
             discordNotif(false, true)
         }
