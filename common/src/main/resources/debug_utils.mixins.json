@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.flemmli97.debugutils.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "DebugPacketsMixin",
+    "pathing.PathAccessor",
+    "pathing.PathFinderMixin"
+  ],
+  "client": [
+    "DebugRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
