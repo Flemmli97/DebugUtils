@@ -6,41 +6,43 @@ This mod adds them back which might be useful for various cases. You will need t
 
 Use the command /debug_utils <feature> to turn a debugging feature on/off
 
-Included debugging features are:
+### Included debugging features are:
 
-POI debugging: Logs adding/removing of POI blocks.
+**POI debugging**: Logs adding/removing of POI blocks.
 
-Block Updates: Displays blocks affected by a change in block states
+**Block Updates**: Displays blocks affected by a change in block states
 
-Structure Generations: Displays the bounding box of newly generated structures
+**Structure Generations**: Displays the bounding box of newly generated structures
 
-Entity Pathing: Will show the pathings of entities
+**Entity Pathing**: Will show the pathings of entities
 
-Entity Goals: Will show various information about an entities ai. Active ones are highlighted.
+**Entity Goals**: Will show various information about an entities ai. Active ones are highlighted.
 
-Raids: Will highlight the center of a raid
+**Raids**: Will highlight the center of a raid
 
-Entity Brains: Similar to goals will display brain activities of entities.
+**Entity Brains**: Similar to goals will display brain activities of entities.
 
-Bees: Displaying information about bees. E.g. if it has a hive or not
+**Bees**: Displaying information about bees. E.g. if it has a hive or not
 
-Game Event + Listener: Highlights game info events and the adding of listeners for it. 
+**Game Event + Listener**: Highlights game info events and the adding of listeners for it. 
 Listeners are e.g. sculk/warden/allays
 And game infos are events which triggers them.
 
-Bee Hives: Shows information about a bee hive
+**Bee Hives**: Shows information about a bee hive
 
-Water: Shows water level of nearby water blocks
+**Water**: Shows water level of nearby water blocks
 
-Heightmap: Displays the heightmap
+**Heightmap**: Displays the heightmap
 
-Collision: Shows nearby block collisions
+**Collision**: Shows nearby block collisions
 
-Light: Shows the sky light value of blocks. Places with direct sky light are not displayed.
+**Light**: Shows the sky light value of blocks. Places with direct sky light are not displayed.
 
-Solid Faces: Shows the solid faces of nearby blocks. A face is solid if it fills the whole plane.
+**Solid Faces**: Shows the solid faces of nearby blocks. A face is solid if it fills the whole plane.
 
-Chunk: Shows nearby chunk data. E.g. if the chunk is entity ticking or not
+**Chunk**: Shows nearby chunk data. E.g. if the chunk is entity ticking or not
+
+### Devs
 
 If you want to use the mod in your dev environment just add the following snippet to your build.gradle
 
