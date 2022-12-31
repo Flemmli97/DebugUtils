@@ -54,6 +54,15 @@ dependencies {
     compileOnly project(":common")
 }
 
+cleanBuild {
+    FilenameFilter filter = (f, s)->!s.equals("fg_cache") //Leave the forge caches
+    delete file("build").listFiles(filter)
+}
+
+project.afterEvaluate {
+    cleanBuild.dependsOn -= clean
+}
+
 processResources {
     from project(":common").sourceSets.main.resources
     def ver = project.version.replace("-${project.name}", "")
