@@ -1,6 +1,7 @@
 plugins {
     id 'idea'
     id 'fabric-loom' version '1.0-SNAPSHOT'
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
 loom {
@@ -82,6 +83,32 @@ publishing {
                 password = project.findProperty("gpr.gitlab.token") ?: System.getenv("GPR_GITLAB_TOKEN")
                 //password = project.findProperty("gpr.github.token") ?: System.getenv("GPR_TOKEN")
             }
+        }
+    }
+}
+
+curseforge {
+    apiKey = findProperty('curseApiToken') ?: 0
+    project {
+        id = "${curse_id_fabric}"
+        "${project.curse_versions}".split(', ').each {
+            addGameVersion "${it}"
+        }
+        addGameVersion "Fabric"
+        mainArtifact(remapJar) {
+            def txt = rootProject.changelog(1).replace("\n-", "\n\n- ")
+            txt = txt + "\n\n" + "For past versions see: ${project.full_changelog}"
+            changelog = txt
+            changelogType = "markdown"
+            releaseType = 'release'
+        }
+        relations {
+            "${project.curse_dep_fabric}".split(', ').each {
+                requiredDependency "${it}"
+            }
+        }
+        afterEvaluate {
+            uploadTask.dependsOn("remapJar")
         }
     }
 }

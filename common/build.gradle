@@ -1,18 +1,36 @@
 plugins {
-    id 'idea'
+    //id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
+    //Using loom here so we can apply parchment
     id 'fabric-loom' version '1.0-SNAPSHOT'
 }
 
+//Vanilla Gradle
+/*
+minecraft {
+    version(minecraft_version)
+    accessWideners file("src/main/resources/debugutils.accesswidener")
+}
+*/
+
+//***Loom setups
 loom {
-    runs {
-        client {
-            vmArgs "-Dmixin.debug.export=true"
-        }
-    }
     mixin {
         useLegacyMixinAp = false
     }
-    accessWidenerPath.set project(":common").file("src/main/resources/debugutils.accesswidener")
+    accessWidenerPath.set file("src/main/resources/debugutils.accesswidener")
+}
+
+//Dont remap
+import net.fabricmc.loom.task.AbstractRemapJarTask
+tasks.withType(AbstractRemapJarTask).each {
+    it.targetNamespace = "named"
+}
+
+repositories {
+    maven {
+        name = 'ParchmentMC'
+        url = 'https://maven.parchmentmc.org'
+    }
 }
 
 dependencies {
@@ -21,49 +39,29 @@ dependencies {
         officialMojangMappings()
         parchment("org.parchmentmc.data:parchment-${minecraft_version}:${rootProject.parchment_version}@zip")
     }
-    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
-    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}"
+    //Here to shut up the missing annotation errors. Do not use!
+    compileOnly "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
-    implementation project(path: ":common", configuration: "namedElements")
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
 }
 
 processResources {
-    from project(":common").sourceSets.main.resources
-    def ver = project.version.replace("-${project.name}", "")
-    inputs.property "version", ver
-
-    filesMatching("fabric.mod.json") {
-        expand "version": ver
-    }
     exclude '.cache/**'
 }
 
-tasks.withType(JavaCompile) {
-    source(project(":common").sourceSets.main.allSource)
-}
-
-jar {
-    classifier "dev"
-}
-
 sourcesJar {
-    def commonSources = project(":common").sourcesJar
-    dependsOn commonSources
-    from commonSources.archiveFile.map { zipTree(it) }
-}
-
-fullRebuild {
-    dependsOn project(":common").fullRebuild
+    from(rootProject.file("LICENSE"))
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact(remapJar) {
-                builtBy remapJar
+            artifact(jar) {
+                classifier null
+                builtBy jar
             }
-            artifact(remapSourcesJar) {
-                builtBy remapSourcesJar
+            artifact(sourcesJar) {
+                builtBy sourcesJar
             }
             artifact(javadocJar) {
                 builtBy javadocJar
