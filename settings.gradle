@@ -1,20 +1,19 @@
 pluginManagement {
     repositories {
-        gradlePluginPortal()
+        maven { url "https://maven.fabricmc.net/" }
+        maven { url "https://maven.architectury.dev/" }
         maven {
-            name = 'forge'
             url = 'https://maven.minecraftforge.net/'
+            content {
+                excludeGroupByRegex "org.eclipse.*"
+            }
         }
-        maven {
-            name = 'fabric'
-            url = 'https://maven.fabricmc.net/'
-        }
-        maven {
-            name = 'Sponge Snapshots'
-            url = 'https://repo.spongepowered.org/repository/maven-public/'
-        }
+        gradlePluginPortal()
     }
 }
 
+include("common")
+include("fabric")
+include("forge")
+
 rootProject.name = "DebugUtils"
-include("common", "fabric", "forge")

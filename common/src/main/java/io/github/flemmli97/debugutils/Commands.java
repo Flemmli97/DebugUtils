@@ -9,7 +9,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -23,8 +23,8 @@ public class Commands {
         dispatcher.register(net.minecraft.commands.Commands.literal(DebugUtils.MODID).requires(src -> src.hasPermission(2))
                 .then(net.minecraft.commands.Commands.argument("module", ResourceLocationArgument.id()).suggests(Commands::getToggles)
                         .executes(Commands::toggleAll)));
-        //.then(net.minecraft.commands.Commands.argument("player", EntityArgument.players())
-        //        .executes(Commands::toggle))));
+                        //.then(net.minecraft.commands.Commands.argument("player", EntityArgument.players())
+                        //        .executes(Commands::toggle))));
     }
 
     private static int toggleAll(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
@@ -41,19 +41,19 @@ public class Commands {
         ResourceLocation id = ResourceLocationArgument.getId(context, "module");
         if (id.equals(DebugToggles.ALL)) {
             DebugToggles.toggleAllOff(players);
-            context.getSource().sendSuccess(Component.literal("Turned all debugging features off"), true);
+            context.getSource().sendSuccess(new TextComponent("Turned all debugging features off"), true);
             return players.size();
         }
         DebugToggles.ResourcedToggle t = DebugToggles.get(id);
         if (t != null) {
             boolean on = t.toggleFor(players);
             String txt = "Turned " + id + (on ? " on" : " off");
-            if (showPlayers)
+            if(showPlayers)
                 txt += " for " + players.stream().map(p -> p.getGameProfile().getName()).toList();
-            context.getSource().sendSuccess(Component.literal(txt), true);
+            context.getSource().sendSuccess(new TextComponent(txt), true);
             return players.size();
         }
-        context.getSource().sendFailure(Component.literal("No such toggle " + id));
+        context.getSource().sendFailure(new TextComponent("No such toggle " + id));
         return 0;
     }
 

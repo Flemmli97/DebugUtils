@@ -1,69 +1,23 @@
-plugins {
-    //Using loom here so we can apply parchment
-    id 'fabric-loom' version '1.0-SNAPSHOT'
-}
-
-loom {
-    mixin {
-        useLegacyMixinAp = false
-    }
-    accessWidenerPath.set file("src/main/resources/debugutils.accesswidener")
-}
-
-repositories {
-    maven {
-        name = 'ParchmentMC'
-        url = 'https://maven.parchmentmc.org'
-    }
-}
-
 dependencies {
-    //Here to shut up the missing annotation errors. Do not use!
-    compileOnly "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
-
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.layered() {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${minecraft_version}:${rootProject.parchment_version}@zip")
-    }
-    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
+    // Do NOT use other classes from fabric loader
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
 }
 
-processResources {
-    exclude '.cache/**'
-}
-
-sourcesJar {
-    from(rootProject.file("LICENSE"))
+architectury {
+    common()
 }
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            artifact(jar) {
-                classifier null
-                builtBy jar
-            }
-            artifact(sourcesJar) {
-                builtBy sourcesJar
-            }
-            artifact(javadocJar) {
-                builtBy javadocJar
-            }
-            artifactId project.modid
-            version project.version
+        mavenCommon(MavenPublication) {
+            artifactId = rootProject.archives_base_name
+            from components.java
         }
     }
 
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
-        maven {
-            url "https://gitlab.com/api/v4/projects/21830712/packages/maven"
-            //url "https://maven.pkg.github.com/flemmli97/<>"
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("GPR_USER")
-                password = project.findProperty("gpr.gitlab.token") ?: System.getenv("GPR_GITLAB_TOKEN")
-                //password = project.findProperty("gpr.github.token") ?: System.getenv("GPR_TOKEN")
-            }
-        }
+        // Add repositories to publish to here.
     }
 }

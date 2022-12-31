@@ -35,7 +35,7 @@ public class DebugUtilsForge {
     }
 
     public void joinServer(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer serverPlayer)
+        if (event.getPlayer() instanceof ServerPlayer serverPlayer)
             DebugToggles.onLogin(serverPlayer);
     }
 }

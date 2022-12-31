@@ -1,7 +1,10 @@
 plugins {
-    id 'fabric-loom' version '1.0-SNAPSHOT'
-    id 'idea'
     id "com.github.johnrengelman.shadow" version "7.1.0"
+}
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
 }
 
 loom {
@@ -10,37 +13,41 @@ loom {
             vmArgs "-Dmixin.debug.export=true"
         }
     }
-    mixin {
-        useLegacyMixinAp = false
-    }
-    accessWidenerPath.set project(":common").file("src/main/resources/debugutils.accesswidener")
+}
+
+configurations {
+    common
+    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.layered() {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${minecraft_version}:${rootProject.parchment_version}@zip")
-    }
-    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}"
 
-    implementation project(path: ":common", configuration: "namedElements")
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 }
 
 processResources {
-    from project(":common").sourceSets.main.resources
-    def ver = project.version.replace("-${project.name}", "")
-    inputs.property "version", ver
+    inputs.property "version", project.version
 
     filesMatching("fabric.mod.json") {
-        expand "version": ver
+        expand "version": project.version
     }
-    exclude '.cache/**'
 }
 
-tasks.withType(JavaCompile) {
-    source(project(":common").sourceSets.main.allSource)
+shadowJar {
+    configurations = [project.configurations.shadowCommon]
+    classifier "dev-shadow"
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+    classifier "fabric"
 }
 
 jar {
@@ -51,22 +58,29 @@ sourcesJar {
     def commonSources = project(":common").sourcesJar
     dependsOn commonSources
     from commonSources.archiveFile.map { zipTree(it) }
+    classifier "fabric-source"
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            // add all the jars that should be included when publishing to maven
             artifact(remapJar) {
+                classifier null
                 builtBy remapJar
             }
-            artifact(remapSourcesJar) {
+            artifact(sourcesJar) {
+                classifier "sources"
                 builtBy remapSourcesJar
             }
-            artifact(javadocJar) {
-                builtBy javadocJar
-            }
-            artifactId project.modid
-            version project.version
+            artifactId project.archives_base_name
+            version project.version + "-fabric"
         }
     }
 
