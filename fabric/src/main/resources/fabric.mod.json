@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "debug_utils",
+  "id": "debugutils",
   "version": "${version}",
   "name": "Debug Utils",
   "description": "Enables various debugging tools from mojang",
@@ -24,7 +24,7 @@
     ]
   },
   "mixins": [
-    "debug_utils.mixins.json"
+    "debugutils.mixins.json"
   ],
   "depends": {
     "fabric": ">=0.58.0+1.18.2",

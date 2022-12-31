@@ -7,6 +7,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.game.DebugPackets;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.entity.LivingEntity;
@@ -180,7 +181,7 @@ public class DebuggingPackets {
             buf.writeFloat(entity.getHealth());
             buf.writeFloat(entity.getMaxHealth());
 
-            BrainUtils.writeBrain(entity, buf);
+            DebugPackets.writeBrain(entity, buf);
             ClientboundCustomPayloadPacket packet = new ClientboundCustomPayloadPacket(ClientboundCustomPayloadPacket.DEBUG_BRAIN, buf);
             sendToAll(packet, (ServerLevel) entity.level);
         }
