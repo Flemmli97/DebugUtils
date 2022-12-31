@@ -19,7 +19,7 @@ def singleUpload = true
 subprojects {
 
     apply plugin: 'java'
-    apply plugin: "maven-publish"
+    apply plugin: 'maven-publish'
 
     java.toolchain.languageVersion = JavaLanguageVersion.of(17)
     java.withSourcesJar()
@@ -68,16 +68,19 @@ subprojects {
         dependsOn clean
     }
 
+    task fullRebuild(group: "build") {
+        dependsOn cleanBuild, build
+        compileJava.mustRunAfter cleanBuild
+    }
+
     task buildAndPublish(group: "publishing") {
-        dependsOn cleanBuild, build, publish
-        build.mustRunAfter cleanBuild
-        publish.mustRunAfter build
+        dependsOn fullRebuild, publish
+        publish.mustRunAfter fullRebuild
     }
 
     task buildAndPublishLocal(group: "publishing") {
-        dependsOn cleanBuild, build, publishToMavenLocal
-        build.mustRunAfter cleanBuild
-        publish.mustRunAfter build
+        dependsOn fullRebuild, publishToMavenLocal
+        publishToMavenLocal.mustRunAfter fullRebuild
     }
 }
 
@@ -120,40 +123,41 @@ def discordChangelog() {
     return res
 }
 
-curseforge {
-    apiKey = findProperty('curseApiToken') ?: 0
-
-    project {
-        id = "${curse_id_fabric}"
-        "${project.curse_versions}".split(', ').each {
-            addGameVersion "${it}"
-        }
-        addGameVersion "Fabric"
-        mainArtifact(project(":fabric").tasks.getByName('jar')) {
-            def txt = changelog(1).replace("\n-", "\n\n- ")
-            txt = txt + "\n\n" + "For past versions see: ${project.full_changelog}"
-            changelog = txt
-            changelogType = "markdown"
-            releaseType = 'release'
-        }
-        relations {
-            "${project.curse_dep_fabric}".split(', ').each {
-                requiredDependency "${it}"
+afterEvaluate {
+    curseforge {
+        apiKey = findProperty('curseApiToken') ?: 0
+        project {
+            id = "${curse_id_fabric}"
+            "${project.curse_versions}".split(', ').each {
+                addGameVersion "${it}"
+            }
+            addGameVersion "Fabric"
+            mainArtifact(project(":fabric").tasks.findByName('remapJar')) {
+                def txt = changelog(1).replace("\n-", "\n\n- ")
+                txt = txt + "\n\n" + "For past versions see: ${project.full_changelog}"
+                changelog = txt
+                changelogType = "markdown"
+                releaseType = 'release'
+            }
+            relations {
+                "${project.curse_dep_fabric}".split(', ').each {
+                    requiredDependency "${it}"
+                }
             }
         }
-    }
-    project {
-        id = "${curse_id_forge}"
-        "${project.curse_versions}".split(', ').each {
-            addGameVersion "${it}"
-        }
-        addGameVersion "Forge"
-        mainArtifact(project(":forge").tasks.getByName('jar')) {
-            def txt = changelog(1).replace("\n-", "\n\n- ")
-            txt = txt + "\n\n" + "For past versions see: ${project.full_changelog}"
-            changelog = txt
-            changelogType = "markdown"
-            releaseType = 'release'
+        project {
+            id = "${curse_id_forge}"
+            "${project.curse_versions}".split(', ').each {
+                addGameVersion "${it}"
+            }
+            addGameVersion "Forge"
+            mainArtifact(project(":forge").tasks.getByName('jar')) {
+                def txt = changelog(1).replace("\n-", "\n\n- ")
+                txt = txt + "\n\n" + "For past versions see: ${project.full_changelog}"
+                changelog = txt
+                changelogType = "markdown"
+                releaseType = 'release'
+            }
         }
     }
 }
@@ -163,6 +167,7 @@ import com.diluv.schoomp.message.Message
 import com.diluv.schoomp.message.embed.Embed
 
 def discordNotif(fabric, forge) {
+    return
     try {
         def webhook = new Webhook(findProperty('discordHook'), "${project.project_name} Upload")
 
@@ -207,7 +212,6 @@ tasks.getByName("curseforge").doLast {
 //Uploading fabric only
 task buildUploadFabric(group: "publishing") {
     dependsOn project("fabric").buildAndPublish, "curseforge${curse_id_fabric}"
-    project("fabric").cleanBuild.mustRunAfter project("common").cleanBuild
     def t = tasks.findByName("curseforge${curse_id_fabric}") //Sometimes when project is not completly setup this can be null. But when run it shouldn't be
     if(t != null)
         t.mustRunAfter project("fabric").publish
@@ -220,7 +224,6 @@ task buildUploadFabric(group: "publishing") {
 //Uploading forge only
 task buildUploadForge(group: "publishing") {
     dependsOn project("forge").buildAndPublish, "curseforge${curse_id_forge}"
-    project("forge").cleanBuild.mustRunAfter project("common").cleanBuild
     def t = tasks.findByName("curseforge${curse_id_forge}") //Sometimes when project is not completly setup this can be null. But when run it shouldn't be
     if(t != null)
         t.mustRunAfter project("forge").publish
@@ -238,18 +241,10 @@ task setMultiUpload {
 }
 
 task buildAndUpload(group: "publishing") {
-    dependsOn setMultiUpload, buildUploadFabric, buildUploadForge
+    dependsOn setMultiUpload, project("common").buildAndPublish, buildUploadFabric, buildUploadForge
     buildUploadFabric.mustRunAfter setMultiUpload
     buildUploadForge.mustRunAfter setMultiUpload
-    project("forge").clean.dependsOn project("common").clean
-    project("fabric").clean.dependsOn project("common").clean
     doLast {
         discordNotif(true, true)
     }
-}
-
-task buildToLocal(group: "publishing") {
-    dependsOn getTasksByName("buildAndPublishLocal", true)
-    project("forge").cleanBuild.dependsOn project("common").cleanBuild
-    project("fabric").cleanBuild.dependsOn project("common").cleanBuild
 }
