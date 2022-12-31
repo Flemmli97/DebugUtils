@@ -52,10 +52,6 @@ sourcesJar {
     from(rootProject.file("LICENSE"))
 }
 
-fullRebuild {
-    dependsOn project(":common").fullRebuild
-}
-
 publishing {
     publications {
         mavenJava(MavenPublication) {

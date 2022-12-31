@@ -167,7 +167,6 @@ import com.diluv.schoomp.message.Message
 import com.diluv.schoomp.message.embed.Embed
 
 def discordNotif(fabric, forge) {
-    return
     try {
         def webhook = new Webhook(findProperty('discordHook'), "${project.project_name} Upload")
 

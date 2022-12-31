@@ -85,7 +85,12 @@ sourcesJar {
 }
 
 cleanBuild {
-    delete file('build').listFiles().findAll {it.name.equals("fg_cache")}.collect() //Leave the forge caches
+    doFirst {
+        delete file('build/classes')
+        delete file('build/libs')
+        delete file('build/resources')
+        delete file('build/tmp')
+    }
 }
 
 project.afterEvaluate {
