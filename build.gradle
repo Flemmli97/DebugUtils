@@ -10,10 +10,11 @@ buildscript {
 }
 
 plugins {
+    id 'java'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
-apply plugin: 'java'
-apply plugin: "maven-publish"
+
+def singleUpload = true
 
 subprojects {
 
@@ -61,6 +62,22 @@ subprojects {
 
     tasks.withType(Javadoc) {
         options.addStringOption('Xdoclint:none', '-quiet')
+    }
+
+    task cleanBuild(group: "build") {
+        dependsOn clean
+    }
+
+    task buildAndPublish(group: "publishing") {
+        dependsOn cleanBuild, build, publish
+        build.mustRunAfter cleanBuild
+        publish.mustRunAfter build
+    }
+
+    task buildAndPublishLocal(group: "publishing") {
+        dependsOn cleanBuild, build, publishToMavenLocal
+        build.mustRunAfter cleanBuild
+        publish.mustRunAfter build
     }
 }
 
@@ -111,7 +128,7 @@ curseforge {
         "${project.curse_versions}".split(', ').each {
             addGameVersion "${it}"
         }
-        addGameVersion "fabric"
+        addGameVersion "Fabric"
         mainArtifact(project(":fabric").tasks.getByName('jar')) {
             def txt = changelog(1).replace("\n-", "\n\n- ")
             txt = txt + "\n\n" + "For past versions see: ${project.full_changelog}"
@@ -130,7 +147,7 @@ curseforge {
         "${project.curse_versions}".split(', ').each {
             addGameVersion "${it}"
         }
-        addGameVersion "forge"
+        addGameVersion "Forge"
         mainArtifact(project(":forge").tasks.getByName('jar')) {
             def txt = changelog(1).replace("\n-", "\n\n- ")
             txt = txt + "\n\n" + "For past versions see: ${project.full_changelog}"
@@ -187,42 +204,52 @@ tasks.getByName("curseforge").doLast {
     discordNotif(true, true)
 }
 
+//Uploading fabric only
+task buildUploadFabric(group: "publishing") {
+    dependsOn project("fabric").buildAndPublish, "curseforge${curse_id_fabric}"
+    project("fabric").cleanBuild.mustRunAfter project("common").cleanBuild
+    def t = tasks.findByName("curseforge${curse_id_fabric}") //Sometimes when project is not completly setup this can be null. But when run it shouldn't be
+    if(t != null)
+        t.mustRunAfter project("fabric").publish
+    doLast {
+        if(project.singleUpload)
+            discordNotif(true, false)
+    }
+}
+
+//Uploading forge only
+task buildUploadForge(group: "publishing") {
+    dependsOn project("forge").buildAndPublish, "curseforge${curse_id_forge}"
+    project("forge").cleanBuild.mustRunAfter project("common").cleanBuild
+    def t = tasks.findByName("curseforge${curse_id_forge}") //Sometimes when project is not completly setup this can be null. But when run it shouldn't be
+    if(t != null)
+        t.mustRunAfter project("forge").publish
+    doLast {
+        if(project.singleUpload)
+            discordNotif(false, true)
+    }
+}
+
+//Use if uploading multiple files at same time to prevent double notifications
+task setMultiUpload {
+    doFirst {
+        singleUpload = false
+    }
+}
+
 task buildAndUpload(group: "publishing") {
-    dependsOn clean, build, publish, tasks.getByName("curseforge")
-    build.mustRunAfter clean
-    tasks.findByName("curseforge").mustRunAfter publish
+    dependsOn setMultiUpload, buildUploadFabric, buildUploadForge
+    buildUploadFabric.mustRunAfter setMultiUpload
+    buildUploadForge.mustRunAfter setMultiUpload
+    project("forge").clean.dependsOn project("common").clean
+    project("fabric").clean.dependsOn project("common").clean
+    doLast {
+        discordNotif(true, true)
+    }
 }
 
 task buildToLocal(group: "publishing") {
-    dependsOn clean, build, publishToMavenLocal
-    build.mustRunAfter clean
+    dependsOn getTasksByName("buildAndPublishLocal", true)
+    project("forge").cleanBuild.dependsOn project("common").cleanBuild
+    project("fabric").cleanBuild.dependsOn project("common").cleanBuild
 }
-
-afterEvaluate {
-    task buildUploadfabric(group: "publishing") {
-        dependsOn clean, ":fabric:build", ":fabric:publish", "curseforge${curse_id_fabric}"
-        project("fabric").build.mustRunAfter clean
-        project("fabric").publish.mustRunAfter ":fabric:build"
-        def t = tasks.findByName("curseforge${curse_id_fabric}") //Sometimes when project is not completly setup this can be null. But when run it shouldn't be
-        if(t != null)
-            t.mustRunAfter ":fabric:publish"
-        doLast {
-            discordNotif(true, false)
-        }
-    }
-
-    task buildUploadforge(group: "publishing") {
-        dependsOn clean, ":forge:build", ":forge:publish", "curseforge${curse_id_forge}"
-        project("forge").build.mustRunAfter clean
-        project("forge").publish.mustRunAfter ":forge:build"
-        def t = tasks.findByName("curseforge${curse_id_forge}") //Sometimes when project is not completly setup this can be null. But when run it shouldn't be
-        if(t != null)
-            t.mustRunAfter ":forge:publish"
-        doLast {
-            discordNotif(false, true)
-        }
-    }
-}
-
-tasks.getByName("curseforge").dependsOn build
-publish.dependsOn build
