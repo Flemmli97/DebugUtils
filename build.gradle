@@ -4,14 +4,7 @@ buildscript {
     }
     dependencies {
         classpath group: 'com.diluv.schoomp', name: 'Schoomp', version: '1.2.6'
-        //Need a more recent version for cursegradle
-        classpath group: 'com.google.guava', name: 'guava', version: '31.1-jre'
     }
-}
-
-plugins {
-    id 'java'
-    id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
 def singleUpload = true
@@ -123,45 +116,6 @@ def discordChangelog() {
     return res
 }
 
-afterEvaluate {
-    curseforge {
-        apiKey = findProperty('curseApiToken') ?: 0
-        project {
-            id = "${curse_id_fabric}"
-            "${project.curse_versions}".split(', ').each {
-                addGameVersion "${it}"
-            }
-            addGameVersion "Fabric"
-            mainArtifact(project(":fabric").tasks.findByName('remapJar')) {
-                def txt = changelog(1).replace("\n-", "\n\n- ")
-                txt = txt + "\n\n" + "For past versions see: ${project.full_changelog}"
-                changelog = txt
-                changelogType = "markdown"
-                releaseType = 'release'
-            }
-            relations {
-                "${project.curse_dep_fabric}".split(', ').each {
-                    requiredDependency "${it}"
-                }
-            }
-        }
-        project {
-            id = "${curse_id_forge}"
-            "${project.curse_versions}".split(', ').each {
-                addGameVersion "${it}"
-            }
-            addGameVersion "Forge"
-            mainArtifact(project(":forge").tasks.getByName('jar')) {
-                def txt = changelog(1).replace("\n-", "\n\n- ")
-                txt = txt + "\n\n" + "For past versions see: ${project.full_changelog}"
-                changelog = txt
-                changelogType = "markdown"
-                releaseType = 'release'
-            }
-        }
-    }
-}
-
 import com.diluv.schoomp.Webhook
 import com.diluv.schoomp.message.Message
 import com.diluv.schoomp.message.embed.Embed
@@ -204,30 +158,20 @@ def discordNotif(fabric, forge) {
     }
 }
 
-tasks.getByName("curseforge").doLast {
-    discordNotif(true, true)
-}
-
 //Uploading fabric only
 task buildUploadFabric(group: "publishing") {
-    dependsOn project("fabric").buildAndPublish, "curseforge${curse_id_fabric}"
-    def t = tasks.findByName("curseforge${curse_id_fabric}") //Sometimes when project is not completly setup this can be null. But when run it shouldn't be
-    if(t != null)
-        t.mustRunAfter project("fabric").publish
+    dependsOn project("fabric").buildAndPublish, ":fabric:curseforge"
     doLast {
-        if(project.singleUpload)
+        if(singleUpload)
             discordNotif(true, false)
     }
 }
 
 //Uploading forge only
 task buildUploadForge(group: "publishing") {
-    dependsOn project("forge").buildAndPublish, "curseforge${curse_id_forge}"
-    def t = tasks.findByName("curseforge${curse_id_forge}") //Sometimes when project is not completly setup this can be null. But when run it shouldn't be
-    if(t != null)
-        t.mustRunAfter project("forge").publish
+    dependsOn project("forge").buildAndPublish, ":forge:curseforge"
     doLast {
-        if(project.singleUpload)
+        if(singleUpload)
             discordNotif(false, true)
     }
 }

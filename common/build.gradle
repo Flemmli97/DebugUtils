@@ -20,6 +20,7 @@ loom {
     accessWidenerPath.set file("src/main/resources/debugutils.accesswidener")
 }
 
+//Dont remap
 import net.fabricmc.loom.task.AbstractRemapJarTask
 tasks.withType(AbstractRemapJarTask).each {
     it.targetNamespace = "named"
