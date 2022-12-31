@@ -1,51 +1,69 @@
 plugins {
-    //Using loom here so we can apply parchment
+    id 'idea'
     id 'fabric-loom' version '1.0-SNAPSHOT'
 }
 
 loom {
+    runs {
+        client {
+            vmArgs "-Dmixin.debug.export=true"
+        }
+    }
     mixin {
         useLegacyMixinAp = false
     }
-    accessWidenerPath.set file("src/main/resources/debugutils.accesswidener")
-}
-
-repositories {
-    maven {
-        name = 'ParchmentMC'
-        url = 'https://maven.parchmentmc.org'
-    }
+    accessWidenerPath.set project(":common").file("src/main/resources/debugutils.accesswidener")
 }
 
 dependencies {
-    //Here to shut up the missing annotation errors. Do not use!
-    compileOnly "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
-
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.layered() {
         officialMojangMappings()
         parchment("org.parchmentmc.data:parchment-${minecraft_version}:${rootProject.parchment_version}@zip")
     }
-    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}"
+
+    implementation project(path: ":common", configuration: "namedElements")
 }
 
 processResources {
+    from project(":common").sourceSets.main.resources
+    def ver = project.version.replace("-${project.name}", "")
+    inputs.property "version", ver
+
+    filesMatching("fabric.mod.json") {
+        expand "version": ver
+    }
     exclude '.cache/**'
 }
 
+tasks.withType(JavaCompile) {
+    source(project(":common").sourceSets.main.allSource)
+}
+
+jar {
+    classifier "dev"
+}
+
 sourcesJar {
-    from(rootProject.file("LICENSE"))
+    def commonSources = project(":common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}
+
+fullRebuild {
+    dependsOn project(":common").fullRebuild
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact(jar) {
-                classifier null
-                builtBy jar
+            artifact(remapJar) {
+                builtBy remapJar
             }
-            artifact(sourcesJar) {
-                builtBy sourcesJar
+            artifact(remapSourcesJar) {
+                builtBy remapSourcesJar
             }
             artifact(javadocJar) {
                 builtBy javadocJar

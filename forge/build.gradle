@@ -1,6 +1,6 @@
 plugins {
+    id 'eclipse'
     id 'net.minecraftforge.gradle' version '5.1.+'
-    id "com.github.johnrengelman.shadow" version "7.1.0"
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
@@ -54,15 +54,6 @@ dependencies {
     compileOnly project(":common")
 }
 
-cleanBuild {
-    FilenameFilter filter = (f, s)->!s.equals("fg_cache") //Leave the forge caches
-    delete file("build").listFiles(filter)
-}
-
-project.afterEvaluate {
-    cleanBuild.dependsOn -= clean
-}
-
 processResources {
     from project(":common").sourceSets.main.resources
     def ver = project.version.replace("-${project.name}", "")
@@ -91,6 +82,23 @@ sourcesJar {
     def commonSources = project(":common").sourcesJar
     dependsOn commonSources
     from commonSources.archiveFile.map { zipTree(it) }
+}
+
+cleanBuild {
+    doFirst {
+        delete file('build/classes')
+        delete file('build/libs')
+        delete file('build/resources')
+        delete file('build/tmp')
+    }
+}
+
+project.afterEvaluate {
+    cleanBuild.dependsOn -= clean
+}
+
+fullRebuild {
+    dependsOn project(":common").fullRebuild
 }
 
 publishing {
