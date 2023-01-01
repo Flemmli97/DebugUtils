@@ -52,7 +52,7 @@ minecraft {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${forge_version}"
-    compileOnly project(":common")
+    implementation project(path: ":common", configuration: "namedElements")
 }
 
 processResources {
@@ -63,7 +63,7 @@ processResources {
     exclude "*.accesswidener"
 
     filesMatching("META-INF/mods.toml") {
-        expand "version": ver
+        expand "version": ver, "homepage": curse_page_fabric, "mcversion": minecraft_version
     }
 }
 
@@ -149,7 +149,7 @@ curseforge {
             releaseType = 'release'
         }
         /*relations {
-            "${project.curse_dep_fabric}".split(', ').each {
+            "${project.curse_dep_forge}".split(', ').each {
                 requiredDependency "${it}"
             }
         }*/

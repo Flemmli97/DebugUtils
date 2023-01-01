@@ -13,7 +13,7 @@ loom {
     mixin {
         useLegacyMixinAp = false
     }
-    accessWidenerPath.set project(":common").file("src/main/resources/debugutils.accesswidener")
+    accessWidenerPath.set project(":common").file("src/main/resources/${modid}.accesswidener")
 }
 
 dependencies {
@@ -34,7 +34,7 @@ processResources {
     inputs.property "version", ver
 
     filesMatching("fabric.mod.json") {
-        expand "version": ver
+        expand "version": ver, "homepage": curse_page_fabric, "mcversion": minecraft_version
     }
     exclude '.cache/**'
 }

@@ -7,8 +7,6 @@ buildscript {
     }
 }
 
-def singleUpload = true
-
 subprojects {
 
     apply plugin: 'java'
@@ -38,6 +36,7 @@ subprojects {
     }
 
     repositories {
+        mavenLocal()
         mavenCentral()
         maven {
             name = 'Sponge / Mixin'
@@ -76,6 +75,8 @@ subprojects {
         publishToMavenLocal.mustRunAfter fullRebuild
     }
 }
+
+def singleUpload = true
 
 def changelog(int versions) {
     try {
@@ -133,11 +134,11 @@ def discordNotif(fabric, forge) {
         def embed = new Embed()
 
         if (fabric) {
-            def fileIDfabric = tasks.getByName("curseforge${project.curse_id_fabric}").property('mainArtifact').fileID
+            def fileIDfabric = project("fabric").tasks.getByName("curseforge${project.curse_id_fabric}").property('mainArtifact').fileID
             embed.addField('Get the fabric version here (When it is accepted)', "${project.findProperty('curse_page_fabric')}/files/${fileIDfabric}", false)
         }
         if (forge) {
-            def fileIDforge = tasks.getByName("curseforge${project.curse_id_forge}").property('mainArtifact').fileID
+            def fileIDforge = project("forge").tasks.getByName("curseforge${project.curse_id_forge}").property('mainArtifact').fileID
             embed.addField('Get the forge version here (When it is accepted)', "${project.findProperty('curse_page_forge')}/files/${fileIDforge}", false)
         }
         def changelog = discordChangelog()
@@ -152,7 +153,6 @@ def discordNotif(fabric, forge) {
 
         webhook.sendMessage(message)
     }
-
     catch (IOException e) {
         println 'Failed to push to the Discord webhook.'
     }

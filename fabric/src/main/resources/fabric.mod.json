@@ -8,7 +8,7 @@
     "Flemmli97"
   ],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/debug-utils-fabric",
+    "homepage": "${homepage}",
     "issues": "https://github.com/Flemmli97/DebugUtils/issues",
     "sources": "https://github.com/Flemmli97/DebugUtils"
   },
@@ -26,8 +26,9 @@
   "mixins": [
     "debugutils.mixins.json"
   ],
+  "accessWidener": "debugutils.accesswidener",
   "depends": {
-    "fabric": ">=0.58.0+1.18.2",
-    "minecraft": ">=1.18.2"
+    "fabric": ">=0.67.0+1.18.2",
+    "minecraft": ">=${mcversion}"
   }
 }
