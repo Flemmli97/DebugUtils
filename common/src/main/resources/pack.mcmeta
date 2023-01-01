@@ -1,6 +1,6 @@
 {
     "pack": {
-        "description": "DebugUtils Resources",
+        "description": "${mod} Resources",
         "pack_format": 9
     }
 }
