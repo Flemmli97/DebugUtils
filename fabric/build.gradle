@@ -2,6 +2,7 @@ plugins {
     id 'idea'
     id 'fabric-loom' version '1.0-SNAPSHOT'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 loom {
@@ -16,6 +17,10 @@ loom {
     accessWidenerPath.set project(":common").file("src/main/resources/${modid}.accesswidener")
 }
 
+configurations {
+    shade // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.layered() {
@@ -25,7 +30,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}"
 
-    implementation project(path: ":common", configuration: "namedElements")
+    compileOnly project(path: ":common")
 }
 
 processResources {
@@ -53,6 +58,16 @@ sourcesJar {
     from commonSources.archiveFile.map { zipTree(it) }
 }
 
+shadowJar {
+    configurations = [project.configurations.shade]
+    dependsOn project(":common").shadowJar
+    classifier "shadow"
+}
+
+remapJar {
+    inputFile.set shadowJar.archiveFile
+}
+
 fullRebuild {
     dependsOn project(":common").fullRebuild
 }
@@ -60,15 +75,9 @@ fullRebuild {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact(remapJar) {
-                builtBy remapJar
-            }
-            artifact(remapSourcesJar) {
-                builtBy remapSourcesJar
-            }
-            artifact(javadocJar) {
-                builtBy javadocJar
-            }
+            artifact remapJar
+            artifact sourcesJar
+            artifact javadocJar
             artifactId project.modid
             version project.version
         }

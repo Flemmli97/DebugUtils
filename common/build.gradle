@@ -1,6 +1,7 @@
 plugins {
     //Using loom here so we can apply parchment
     id 'fabric-loom' version '1.0-SNAPSHOT'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 loom {
@@ -13,6 +14,10 @@ loom {
 //Dont remap jar
 tasks.withType(net.fabricmc.loom.task.AbstractRemapJarTask).each {
     it.targetNamespace = "named"
+}
+
+configurations {
+    shade // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
 }
 
 repositories {
@@ -45,6 +50,19 @@ processResources {
     exclude '.cache/**'
 }
 
+shadowJar {
+    configurations = [project.configurations.shade]
+    classifier "dev-shadow"
+}
+
+jar {
+    dependsOn shadowJar
+}
+
+remapJar {
+    inputFile.set shadowJar.archiveFile
+}
+
 sourcesJar {
     from(rootProject.file("LICENSE"))
 }
@@ -52,16 +70,9 @@ sourcesJar {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact(jar) {
-                classifier null
-                builtBy jar
-            }
-            artifact(sourcesJar) {
-                builtBy sourcesJar
-            }
-            artifact(javadocJar) {
-                builtBy javadocJar
-            }
+            artifact remapJar
+            artifact sourcesJar
+            artifact javadocJar
             artifactId project.modid
             version project.version
         }
