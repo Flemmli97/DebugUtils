@@ -3,6 +3,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '5.1.+'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 minecraft {
@@ -50,9 +51,13 @@ minecraft {
     }
 }
 
+configurations {
+    shade // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+}
+
 dependencies {
     minecraft "net.minecraftforge:forge:${forge_version}"
-    implementation project(path: ":common", configuration: "namedElements")
+    implementation project(path: ":common")
 }
 
 processResources {
@@ -77,7 +82,17 @@ jar {
     }
 }
 
-jar.finalizedBy('reobfJar')
+shadowJar {
+    configurations = [project.configurations.shade]
+    dependsOn project(":common").shadowJar
+    classifier null
+}
+
+reobf {
+    shadowJar {}
+}
+tasks.build.dependsOn reobfShadowJar
+jar.finalizedBy('reobfShadowJar')
 
 sourcesJar {
     def commonSources = project(":common").sourcesJar
@@ -105,16 +120,9 @@ fullRebuild {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            // add all the jars that should be included when publishing to maven
-            artifact(jar) {
-                builtBy jar
-            }
-            artifact(sourcesJar) {
-                builtBy sourcesJar
-            }
-            artifact(javadocJar) {
-                builtBy javadocJar
-            }
+            artifact jar
+            artifact sourcesJar
+            artifact javadocJar
             artifactId project.archivesBaseName
             version project.version
         }
