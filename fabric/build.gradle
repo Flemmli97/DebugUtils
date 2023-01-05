@@ -11,9 +11,6 @@ loom {
             vmArgs "-Dmixin.debug.export=true"
         }
     }
-    mixin {
-        useLegacyMixinAp = false
-    }
     accessWidenerPath.set project(":common").file("src/main/resources/${modid}.accesswidener")
 }
 
