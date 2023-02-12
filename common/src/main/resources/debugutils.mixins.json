@@ -6,7 +6,8 @@
   "mixins": [
     "DebugPacketsMixin",
     "pathing.PathAccessor",
-    "pathing.PathFinderMixin"
+    "pathing.PathFinderMixin",
+    "DistanceManagerMixin"
   ],
   "client": [
     "DebugRendererMixin"

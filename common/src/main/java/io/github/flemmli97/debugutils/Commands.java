@@ -23,8 +23,8 @@ public class Commands {
         dispatcher.register(net.minecraft.commands.Commands.literal(DebugUtils.MODID).requires(src -> src.hasPermission(2))
                 .then(net.minecraft.commands.Commands.argument("module", ResourceLocationArgument.id()).suggests(Commands::getToggles)
                         .executes(Commands::toggleAll)));
-                        //.then(net.minecraft.commands.Commands.argument("player", EntityArgument.players())
-                        //        .executes(Commands::toggle))));
+        //.then(net.minecraft.commands.Commands.argument("player", EntityArgument.players())
+        //        .executes(Commands::toggle))));
     }
 
     private static int toggleAll(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
@@ -48,7 +48,7 @@ public class Commands {
         if (t != null) {
             boolean on = t.toggleFor(players);
             String txt = "Turned " + id + (on ? " on" : " off");
-            if(showPlayers)
+            if (showPlayers)
                 txt += " for " + players.stream().map(p -> p.getGameProfile().getName()).toList();
             context.getSource().sendSuccess(new TextComponent(txt), true);
             return players.size();

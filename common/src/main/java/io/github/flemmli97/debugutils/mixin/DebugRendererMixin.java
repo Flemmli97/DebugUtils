@@ -1,6 +1,7 @@
 package io.github.flemmli97.debugutils.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.flemmli97.debugutils.client.AdditionalDebugRenderers;
 import io.github.flemmli97.debugutils.client.RenderBools;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.debug.BeeDebugRenderer;
@@ -84,5 +85,11 @@ public class DebugRendererMixin {
             this.goalSelectorRenderer.render(poseStack, bufferSource, camX, camY, camZ);
         if (RenderBools.DEBUG_GAME_EVENT || RenderBools.DEBUG_GAME_EVENT_LISTENER)
             this.gameEventListenerRenderer.render(poseStack, bufferSource, camX, camY, camZ);
+        AdditionalDebugRenderers.render(poseStack, bufferSource, camX, camY, camZ);
+    }
+
+    @Inject(method = "clear", at = @At("HEAD"))
+    private void onClear(CallbackInfo info) {
+        AdditionalDebugRenderers.clearRenderers();
     }
 }

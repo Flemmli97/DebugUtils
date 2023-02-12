@@ -6,6 +6,6 @@ import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 public class DebugUtilsClient {
 
     public static void disconnect(ClientPlayerNetworkEvent.LoggedOutEvent event) {
-        RenderBools.onDisconnet();
+        RenderBools.onDisconnect();
     }
 }
