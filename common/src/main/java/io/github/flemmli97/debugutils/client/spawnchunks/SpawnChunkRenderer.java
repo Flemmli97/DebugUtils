@@ -54,21 +54,23 @@ public class SpawnChunkRenderer implements DebugRenderer.SimpleDebugRenderer {
         QUADS.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         LINES.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        RenderSystem.disableTexture();
+        RenderSystem.disableCull();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         RenderSystem.enableDepthTest();
+        RenderSystem.depthMask(false);
+
         float renderDistance = Minecraft.getInstance().gameRenderer.getRenderDistance() + 16;
 
         if (viewPos.distanceToSqr(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5) < renderDistance * renderDistance)
             this.renderBox(QUADS, new AABB(spawnPos).move(-camX, -camY, -camZ).inflate(-0.0001), 220 / 255f, 100 / 255f, 100 / 255f, 0.5f);
 
-        this.renderBorder(viewPos, renderDistance, spawnChunkAABB, SectionPos.sectionToBlockCoord(range),
+        this.renderBorder(renderDistance, spawnChunkAABB, SectionPos.sectionToBlockCoord(range),
                 QUADS, LINES, 220 / 255f, 100 / 255f, 100 / 255f);
 
-        this.renderBorder(viewPos, renderDistance, spawnChunkAABB, SectionPos.sectionToBlockCoord(range - 2),
+        this.renderBorder(renderDistance, spawnChunkAABB, SectionPos.sectionToBlockCoord(range - 2),
                 QUADS, LINES, 20 / 255f, 170 / 255f, 10 / 255f);
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
         QUADS.end();
         BufferUploader.end(QUADS);
 
@@ -77,25 +79,26 @@ public class SpawnChunkRenderer implements DebugRenderer.SimpleDebugRenderer {
         LINES.end();
         BufferUploader.end(LINES);
         RenderSystem.lineWidth(1.0F);
-        RenderSystem.enableBlend();
-        RenderSystem.enableTexture();
+
+        RenderSystem.enableCull();
         RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(true);
     }
 
-    private void renderBorder(Vec3 position, float renderDistance, AABB base, double range, VertexConsumer quads, VertexConsumer lines, float red, float green, float blue) {
+    private void renderBorder(float renderDistance, AABB base, double range, VertexConsumer quads, VertexConsumer lines, float red, float green, float blue) {
         AABB aabb = base.inflate(range, 0, range);
         List<Direction> tooFarAway = new ArrayList<>();
-        double dXMin = Math.abs(position.x() - base.minX);
-        double dXMax = Math.abs(position.x() - base.maxX);
-        double dZMin = Math.abs(position.z() - base.minZ);
-        double dZMax = Math.abs(position.z() - base.maxZ);
-        if (Math.min(dZMin, Math.min(dXMin, dXMax)) > renderDistance)
+        double dXMin = Math.abs(aabb.minX);
+        double dXMax = Math.abs(aabb.maxX);
+        double dZMin = Math.abs(aabb.minZ);
+        double dZMax = Math.abs(aabb.maxZ);
+        if (dZMin > renderDistance || aabb.minX > renderDistance || aabb.maxX < -renderDistance)
             tooFarAway.add(Direction.NORTH);
-        if (Math.min(dXMax, Math.min(dZMin, dZMax)) > renderDistance)
+        if (dXMax > renderDistance || aabb.minZ > renderDistance || aabb.maxZ < -renderDistance)
             tooFarAway.add(Direction.EAST);
-        if (Math.min(dZMax, Math.min(dXMin, dXMax)) > renderDistance)
+        if (dZMax > renderDistance || aabb.minX > renderDistance || aabb.maxX < -renderDistance)
             tooFarAway.add(Direction.SOUTH);
-        if (Math.min(dXMin, Math.min(dZMin, dZMax)) > renderDistance)
+        if (dXMin > renderDistance || aabb.minZ > renderDistance || aabb.maxZ < -renderDistance)
             tooFarAway.add(Direction.WEST);
         this.renderWall(quads, aabb, tooFarAway, red, green, blue, 0.2f);
         this.renderLines(lines, aabb, tooFarAway, red, green, blue);
@@ -184,35 +187,6 @@ public class SpawnChunkRenderer implements DebugRenderer.SimpleDebugRenderer {
             consumer.vertex(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
             consumer.vertex(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
             consumer.vertex(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-        }
-
-        //Inner
-        if (renderWest) {
-            consumer.vertex(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-            consumer.vertex(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-            consumer.vertex(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-            consumer.vertex(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
-        }
-
-        if (renderEast) {
-            consumer.vertex(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
-            consumer.vertex(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-            consumer.vertex(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-            consumer.vertex(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-        }
-
-        if (renderNorth) {
-            consumer.vertex(maxX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-            consumer.vertex(minX, maxY, minZ).color(red, green, blue, alpha).endVertex();
-            consumer.vertex(minX, minY, minZ).color(red, green, blue, alpha).endVertex();
-            consumer.vertex(maxX, minY, minZ).color(red, green, blue, alpha).endVertex();
-        }
-
-        if (renderSouth) {
-            consumer.vertex(minX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-            consumer.vertex(maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-            consumer.vertex(maxX, minY, maxZ).color(red, green, blue, alpha).endVertex();
-            consumer.vertex(minX, minY, maxZ).color(red, green, blue, alpha).endVertex();
         }
     }
 
