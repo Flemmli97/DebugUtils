@@ -4,7 +4,7 @@
 Mojang has various debugging tools implemented in minecraft that are removed for the release jar.
 This mod adds them back which might be useful for various cases. You will need this mod on both the client and the server.
 
-Use the command /debug_utils <feature> to turn a debugging feature on/off
+Use the command /debugutils <feature> to turn a debugging feature on/off
 
 ### Included debugging features are:
 
@@ -41,6 +41,8 @@ And game infos are events which triggers them.
 **Solid Faces**: Shows the solid faces of nearby blocks. A face is solid if it fills the whole plane.
 
 **Chunk**: Shows nearby chunk data. E.g. if the chunk is entity ticking or not
+
+**Spawn Chunks**: Shows entity ticking and lazy spawn chunks
 
 ### Devs
 
