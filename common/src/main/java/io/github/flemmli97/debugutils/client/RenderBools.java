@@ -33,6 +33,7 @@ public class RenderBools {
         HANDLERS.put(new ResourceLocation("debug/light"), b -> DEBUG_LIGHT = b);
         HANDLERS.put(new ResourceLocation("debug/solid_faces"), b -> DEBUG_SOLID_FACES = b);
         HANDLERS.put(new ResourceLocation("debug/chunk"), b -> DEBUG_CHUNK = b);
+        HANDLERS.put(new ResourceLocation("debug/spawn_chunk"), b -> DEBUG_SPAWN_CHUNK = b);
     }
 
     public static boolean DEBUG_POI;
@@ -54,8 +55,15 @@ public class RenderBools {
     public static boolean DEBUG_LIGHT;
     public static boolean DEBUG_SOLID_FACES;
     public static boolean DEBUG_CHUNK;
+    public static boolean DEBUG_SPAWN_CHUNK;
 
-    public static void onDisconnet() {
+    public static synchronized void registerClientHandler(ResourceLocation id, Consumer<Boolean> consumer) {
+        if (HANDLERS.containsKey(id))
+            throw new IllegalArgumentException("A toggle with id" + id + " is already registered");
+        HANDLERS.put(id, consumer);
+    }
+
+    public static void onDisconnect() {
         HANDLERS.values().forEach(c -> c.accept(false));
     }
 }

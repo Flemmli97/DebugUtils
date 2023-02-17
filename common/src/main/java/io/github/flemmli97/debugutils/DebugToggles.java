@@ -1,13 +1,16 @@
 package io.github.flemmli97.debugutils;
 
 import io.github.flemmli97.debugutils.network.S2CDebugToggle;
+import io.github.flemmli97.debugutils.network.S2CSpawnChunk;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.BiConsumer;
 
 /**
  * Serverside toggles
@@ -36,10 +39,19 @@ public class DebugToggles {
     public static final ResourcedToggle DEBUG_LIGHT = register(new ResourceLocation("debug/light"));
     public static final ResourcedToggle DEBUG_SOLID_FACES = register(new ResourceLocation("debug/solid_faces"));
     public static final ResourcedToggle DEBUG_CHUNK = register(new ResourceLocation("debug/chunk"));
+    public static final ResourcedToggle DEBUG_SPAWN_CHUNK = register(new ResourcedToggle(new ResourceLocation("debug/spawn_chunk"), (b, players) -> players.forEach(p -> {
+        S2CSpawnChunk pkt = new S2CSpawnChunk(p.getLevel());
+        Network.INSTANCE.sendToClient(pkt, p);
+    })));
 
     public static ResourcedToggle register(ResourceLocation id) {
-        ResourcedToggle toggle = new ResourcedToggle(id);
-        GETTER.put(id, toggle);
+        return register(new ResourcedToggle(id));
+    }
+
+    public static synchronized ResourcedToggle register(ResourcedToggle toggle) {
+        if (GETTER.containsKey(toggle.id))
+            throw new IllegalArgumentException("A toggle with id" + toggle.id + " is already registered");
+        GETTER.put(toggle.id, toggle);
         return toggle;
     }
 
@@ -54,8 +66,7 @@ public class DebugToggles {
     public static void onLogin(ServerPlayer player) {
         GETTER.values().forEach(t -> {
             if (t.get()) {
-                S2CDebugToggle pkt = new S2CDebugToggle(t.id, true);
-                Network.INSTANCE.sendToClient(pkt, player);
+                t.updateFor(Set.of(player));
             }
         });
     }
@@ -72,16 +83,29 @@ public class DebugToggles {
 
         public final ResourceLocation id;
         private boolean on;
+        private final BiConsumer<Boolean, Collection<ServerPlayer>> onToggle;
 
         public ResourcedToggle(ResourceLocation id) {
             this.id = id;
+            this.onToggle = null;
         }
 
-        public boolean toggleFor(Collection<ServerPlayer> player) {
+        public ResourcedToggle(ResourceLocation id, BiConsumer<Boolean, Collection<ServerPlayer>> onToggle) {
+            this.id = id;
+            this.onToggle = onToggle;
+        }
+
+        public boolean toggleFor(Collection<ServerPlayer> players) {
             this.on = !this.on;
-            S2CDebugToggle pkt = new S2CDebugToggle(this.id, this.on);
-            player.forEach(p -> Network.INSTANCE.sendToClient(pkt, p));
+            this.updateFor(players);
             return this.on;
+        }
+
+        public void updateFor(Collection<ServerPlayer> players) {
+            if (this.onToggle != null)
+                this.onToggle.accept(this.on, players);
+            S2CDebugToggle pkt = new S2CDebugToggle(this.id, this.on);
+            players.forEach(p -> Network.INSTANCE.sendToClient(pkt, p));
         }
 
         public boolean get() {
