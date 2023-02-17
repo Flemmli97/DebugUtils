@@ -48,7 +48,7 @@ public class SpawnChunkRenderer implements DebugRenderer.SimpleDebugRenderer {
 
         int minX = SectionPos.sectionToBlockCoord(SectionPos.blockToSectionCoord(spawnPos.getX()));
         int minZ = SectionPos.sectionToBlockCoord(SectionPos.blockToSectionCoord(spawnPos.getZ()));
-        AABB spawnChunkAABB = new AABB(minX, level.getMinBuildHeight(), minZ, minX + 16, level.getMaxBuildHeight(), minX + 16)
+        AABB spawnChunkAABB = new AABB(minX, level.getMinBuildHeight(), minZ, minX + 16, level.getMaxBuildHeight(), minZ + 16)
                 .move(-camX, -camY, -camZ);
 
         QUADS.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
