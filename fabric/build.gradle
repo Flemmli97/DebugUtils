@@ -36,7 +36,7 @@ processResources {
     inputs.property "version", ver
 
     filesMatching("fabric.mod.json") {
-        expand "version": ver, "homepage": curse_page_fabric, "mcversion": minecraft_version
+        expand "version": ver, "homepage": curse_page_fabric, "mcversion": minecraft_version, "fabric_version": fabric_version
     }
     exclude '.cache/**'
 }

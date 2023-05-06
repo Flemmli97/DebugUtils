@@ -28,7 +28,7 @@
   ],
   "accessWidener": "debugutils.accesswidener",
   "depends": {
-    "fabric": ">=0.70.0+1.19.3",
+    "fabric": ">=${fabric_version}",
     "minecraft": ">=${mcversion}"
   }
 }
