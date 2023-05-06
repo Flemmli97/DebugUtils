@@ -15,7 +15,7 @@ plugins {
 apply plugin: 'org.spongepowered.mixin'
 
 minecraft {
-    mappings channel: 'parchment', version: parchment_version + "-" + minecraft_version
+    mappings channel: 'parchment', version: parchment_version + "-" + parchment_version_mc
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     runs {
         client {

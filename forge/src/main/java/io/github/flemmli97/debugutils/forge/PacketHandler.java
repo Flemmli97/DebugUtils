@@ -34,7 +34,7 @@ public class PacketHandler {
     }
 
     public static <T> void sendToClient(T message, ServerPlayer player) {
-        DISPATCHER.sendTo(message, player.connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
+        DISPATCHER.sendTo(message, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     private static <T> BiConsumer<T, Supplier<NetworkEvent.Context>> handlerClient(Consumer<T> handler) {
