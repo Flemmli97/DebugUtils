@@ -1,3 +1,7 @@
+DebugUtils 1.0.3
+================
+- Fix refmap entry missing
+
 DebugUtils 1.0.2
 ================
 - Add api to register more debug renderers 

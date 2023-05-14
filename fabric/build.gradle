@@ -39,6 +39,9 @@ processResources {
         expand "version": ver, "homepage": curse_page_fabric, "mcversion": minecraft_version
     }
     exclude '.cache/**'
+    filesMatching('*.mixins.json') {
+        expand "refmap_target": "debugutils-"
+    }
 }
 
 tasks.withType(JavaCompile) {
