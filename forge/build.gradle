@@ -69,6 +69,11 @@ dependencies {
     implementation project(path: ":common")
 }
 
+mixin {
+    add sourceSets.main, "debugutils-refmap.json"
+    config "debugutils.mixins.json"
+}
+
 processResources {
     from project(":common").sourceSets.main.resources
     def ver = project.version.replace("-${project.name}", "")
@@ -78,6 +83,9 @@ processResources {
 
     filesMatching("META-INF/mods.toml") {
         expand "version": ver, "homepage": curse_page_fabric, "mcversion": minecraft_version
+    }
+    filesMatching('*.mixins.json') {
+        expand "refmap_target": "debugutils-"
     }
 }
 

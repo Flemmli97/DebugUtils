@@ -1,3 +1,7 @@
+DebugUtils 1.0.3
+================
+- Fix refmap entry missing
+
 DebugUtils 1.0.2
 ================
 - Update to 1.19.4
