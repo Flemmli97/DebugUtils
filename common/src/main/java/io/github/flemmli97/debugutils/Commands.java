@@ -41,7 +41,7 @@ public class Commands {
         ResourceLocation id = ResourceLocationArgument.getId(context, "module");
         if (id.equals(DebugToggles.ALL)) {
             DebugToggles.toggleAllOff(players);
-            context.getSource().sendSuccess(Component.literal("Turned all debugging features off"), true);
+            context.getSource().sendSuccess(()->Component.literal("Turned all debugging features off"), true);
             return players.size();
         }
         DebugToggles.ResourcedToggle t = DebugToggles.get(id);
@@ -50,7 +50,8 @@ public class Commands {
             String txt = "Turned " + id + (on ? " on" : " off");
             if (showPlayers)
                 txt += " for " + players.stream().map(p -> p.getGameProfile().getName()).toList();
-            context.getSource().sendSuccess(Component.literal(txt), true);
+            Component comp = Component.literal(txt);
+            context.getSource().sendSuccess(()->comp, true);
             return players.size();
         }
         context.getSource().sendFailure(Component.literal("No such toggle " + id));

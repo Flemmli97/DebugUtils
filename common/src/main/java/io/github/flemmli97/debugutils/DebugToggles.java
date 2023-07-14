@@ -40,7 +40,7 @@ public class DebugToggles {
     public static final ResourcedToggle DEBUG_SOLID_FACES = register(new ResourceLocation("debug/solid_faces"));
     public static final ResourcedToggle DEBUG_CHUNK = register(new ResourceLocation("debug/chunk"));
     public static final ResourcedToggle DEBUG_SPAWN_CHUNK = register(new ResourcedToggle(new ResourceLocation("debug/spawn_chunk"), (b, players) -> players.forEach(p -> {
-        S2CSpawnChunk pkt = new S2CSpawnChunk(p.getLevel());
+        S2CSpawnChunk pkt = new S2CSpawnChunk(p.serverLevel());
         Network.INSTANCE.sendToClient(pkt, p);
     })));
 

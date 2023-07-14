@@ -163,7 +163,7 @@ public class DebuggingPackets {
     }
 
     public static void sendBrainPacket(LivingEntity entity) {
-        if (DebugToggles.DEBUG_BRAINS.get() && !entity.level.isClientSide) {
+        if (DebugToggles.DEBUG_BRAINS.get() && !entity.level().isClientSide) {
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             Vec3 pos = entity.position();
             buf.writeDouble(pos.x());
@@ -184,12 +184,12 @@ public class DebuggingPackets {
 
             DebugPackets.writeBrain(entity, buf);
             ClientboundCustomPayloadPacket packet = new ClientboundCustomPayloadPacket(ClientboundCustomPayloadPacket.DEBUG_BRAIN, buf);
-            sendToAll(packet, (ServerLevel) entity.level);
+            sendToAll(packet, (ServerLevel) entity.level());
         }
     }
 
     public static void sendBeeInfo(Bee bee) {
-        if (DebugToggles.DEBUG_BEES.get() && !bee.level.isClientSide) {
+        if (DebugToggles.DEBUG_BEES.get() && !bee.level().isClientSide) {
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             Vec3 pos = bee.position();
             buf.writeDouble(pos.x());
@@ -228,7 +228,7 @@ public class DebuggingPackets {
             bee.getBlacklistedHives().forEach(h -> buf.writeUtf(h.toShortString()));
 
             ClientboundCustomPayloadPacket packet = new ClientboundCustomPayloadPacket(ClientboundCustomPayloadPacket.DEBUG_BEE, buf);
-            sendToAll(packet, (ServerLevel) bee.level);
+            sendToAll(packet, (ServerLevel) bee.level());
         }
     }
 
