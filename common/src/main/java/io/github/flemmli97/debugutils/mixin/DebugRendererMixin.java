@@ -4,12 +4,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.flemmli97.debugutils.client.AdditionalDebugRenderers;
 import io.github.flemmli97.debugutils.client.RenderBools;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.debug.BeeDebugRenderer;
 import net.minecraft.client.renderer.debug.BrainDebugRenderer;
 import net.minecraft.client.renderer.debug.BreezeDebugRenderer;
 import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.client.renderer.debug.GameEventListenerRenderer;
 import net.minecraft.client.renderer.debug.GoalSelectorDebugRenderer;
+import net.minecraft.client.renderer.debug.NeighborsUpdateRenderer;
 import net.minecraft.client.renderer.debug.PathfindingRenderer;
 import net.minecraft.client.renderer.debug.RaidDebugRenderer;
 import net.minecraft.client.renderer.debug.StructureRenderer;
@@ -32,7 +34,7 @@ public class DebugRendererMixin {
     @Shadow
     private DebugRenderer.SimpleDebugRenderer collisionBoxRenderer;
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer neighborsUpdateRenderer;
+    private NeighborsUpdateRenderer neighborsUpdateRenderer;
     @Shadow
     private StructureRenderer structureRenderer;
     @Shadow
@@ -59,7 +61,7 @@ public class DebugRendererMixin {
     private BreezeDebugRenderer breezeDebugRenderer;
 
     @Inject(method = "render", at = @At("RETURN"))
-    private void doDebugRenderers(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, double camX, double camY, double camZ, CallbackInfo info) {
+    private void doDebugRenderers(PoseStack poseStack, Frustum frustum, MultiBufferSource.BufferSource bufferSource, double camX, double camY, double camZ, CallbackInfo info) {
         if (RenderBools.DEBUG_PATHS)
             this.pathfindingRenderer.render(poseStack, bufferSource, camX, camY, camZ);
         if (RenderBools.DEBUG_WATER)

@@ -12,7 +12,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import io.github.flemmli97.debugutils.client.RenderBools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.core.BlockPos;
@@ -50,13 +50,13 @@ public class SpawnChunkRenderer implements DebugRenderer.SimpleDebugRenderer {
 
         int minX = SectionPos.sectionToBlockCoord(SectionPos.blockToSectionCoord(spawnPos.getX()));
         int minZ = SectionPos.sectionToBlockCoord(SectionPos.blockToSectionCoord(spawnPos.getZ()));
-        AABB spawnChunkAABB = new AABB(minX, level.getMinBuildHeight(), minZ, minX + 16, level.getMaxBuildHeight(), minZ + 16)
+        AABB spawnChunkAABB = new AABB(minX, level.getMinY(), minZ, minX + 16, level.getMaxY(), minZ + 16)
                 .move(-camX, -camY, -camZ);
 
         BufferBuilder quads = new BufferBuilder(QUADS, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
         BufferBuilder lines = new BufferBuilder(LINES, VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(CoreShaders.POSITION_COLOR);
         RenderSystem.disableCull();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
