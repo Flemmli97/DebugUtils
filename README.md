@@ -54,7 +54,7 @@ If you want to use the mod in your dev environment just add the following snippe
 ```gradle
 repositories {
     maven {
-        url "https://gitlab.com/api/v4/projects/21830712/packages/maven"
+        url "https://maven.blazing-coop.net/releases"
     }
 }
 

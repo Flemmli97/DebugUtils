@@ -85,7 +85,7 @@ publishing {
 
     repositories {
         maven {
-            url "https://gitlab.com/api/v4/projects/21830712/packages/maven"
+            url "https://maven.blazing-coop.net/releases"
             //url "https://maven.pkg.github.com/flemmli97/<>"
             credentials {
                 username = project.findProperty("gpr.user") ?: System.getenv("GPR_USER")
