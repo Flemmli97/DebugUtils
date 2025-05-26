@@ -7,7 +7,7 @@ public interface Network {
 
     Network INSTANCE = DebugUtils.getPlatformInstance(Network.class,
             "io.github.flemmli97.debugutils.fabric.NetworkImpl",
-            "io.github.flemmli97.debugutils.forge.NetworkImpl");
+            "io.github.flemmli97.debugutils.neoforge.NetworkImpl");
 
     void sendToClient(CustomPacketPayload pkt, ServerPlayer player);
 }

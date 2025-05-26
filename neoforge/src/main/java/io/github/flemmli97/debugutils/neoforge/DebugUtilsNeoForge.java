@@ -1,4 +1,4 @@
-package io.github.flemmli97.debugutils.forge;
+package io.github.flemmli97.debugutils.neoforge;
 
 import io.github.flemmli97.debugutils.DebugCommands;
 import io.github.flemmli97.debugutils.DebugToggles;
@@ -18,9 +18,9 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 @Mod(DebugUtils.MODID)
-public class DebugUtilsForge {
+public class DebugUtilsNeoForge {
 
-    public DebugUtilsForge(IEventBus modBus) {
+    public DebugUtilsNeoForge(IEventBus modBus) {
         modBus.addListener(this::registerPackets);
         NeoForge.EVENT_BUS.addListener(this::command);
         NeoForge.EVENT_BUS.addListener(this::leaveServer);

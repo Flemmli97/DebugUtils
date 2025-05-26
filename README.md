@@ -60,9 +60,9 @@ repositories {
 
 dependencies {    
     //Fabric==========    
-    modRuntime("io.github.flemmli97:debugutils:${minecraft_version}-${mod_version}-fabric")
+    modRuntime("io.github.flemmli97:debugutils:${minecraft_version}-${mod_version}-{mod_loader}")
     
-    //Forge==========    
-    runtimeOnly fg.deobf("io.github.flemmli97:debugutils:${minecraft_version}-${mod_version}-forge")
+    //NeoForge==========    
+    runtimeOnly fg.deobf("io.github.flemmli97:debugutils:${minecraft_version}-${mod_version}-{mod_loader}")
 }
 ```
