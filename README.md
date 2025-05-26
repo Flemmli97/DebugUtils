@@ -54,15 +54,15 @@ If you want to use the mod in your dev environment just add the following snippe
 ```gradle
 repositories {
     maven {
-        url "https://gitlab.com/api/v4/projects/21830712/packages/maven"
+        url "https://maven.blazing-coop.net/releases"
     }
 }
 
 dependencies {    
     //Fabric==========    
-    modRuntime("io.github.flemmli97:debugutils:${minecraft_version}-${mod_version}-fabric")
+    modRuntime("io.github.flemmli97:debugutils:${minecraft_version}-${mod_version}-{mod_loader}")
     
-    //Forge==========    
-    runtimeOnly fg.deobf("io.github.flemmli97:debugutils:${minecraft_version}-${mod_version}-forge")
+    //NeoForge==========    
+    runtimeOnly fg.deobf("io.github.flemmli97:debugutils:${minecraft_version}-${mod_version}-{mod_loader}")
 }
 ```

@@ -1,3 +1,7 @@
+DebugUtils 1.0.6.b
+================
+- Fix fabric packets
+
 DebugUtils 1.0.6
 ================
 - Fix mixin refmap
