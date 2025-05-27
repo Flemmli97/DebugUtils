@@ -1,3 +1,8 @@
+DebugUtils 1.0.7
+================
+- Update to 1.21.4 #4 [@drouarb](https://github.com/drouarb)
+- Note apart from this push this version will not be supported
+
 DebugUtils 1.0.6.b
 ================
 - Fix fabric packets
