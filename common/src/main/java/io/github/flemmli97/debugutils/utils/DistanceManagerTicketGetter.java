@@ -6,8 +6,11 @@ import net.minecraft.world.level.ChunkPos;
 
 public interface DistanceManagerTicketGetter {
 
-    int debugUtils$getTicketLevel(TicketType<?> type, BlockPos pos);
+    int debugUtils$getTicketLevel(TicketType type, BlockPos pos);
 
-    int debugUtils$getTicketLevel(TicketType<?> type, ChunkPos pos);
+    /**
+     * @return The ticket level for the given chunk or -1 if not present.
+     */
+    int debugUtils$getTicketLevel(TicketType type, ChunkPos pos);
 
 }

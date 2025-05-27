@@ -183,7 +183,7 @@ public class DebuggingPackets {
                 inventory = carrier.getInventory().isEmpty() ? "" : carrier.getInventory().toString();
             }
             if (entity instanceof Villager villager) {
-                profession = villager.getVillagerData().getProfession().name();
+                profession = villager.getVillagerData().profession().value().name().getString();
                 xp = villager.getVillagerXp();
                 wantsGolem = villager.wantsToSpawnGolem(entity.level().getGameTime());
                 List<String> list = Lists.newArrayList();

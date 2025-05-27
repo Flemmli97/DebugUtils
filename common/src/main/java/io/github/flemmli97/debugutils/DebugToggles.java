@@ -53,6 +53,7 @@ public class DebugToggles {
     public static final ResourcedToggle DEBUG_WATER = register(ResourceLocation.parse("debug/water"));
     public static final ResourcedToggle DEBUG_HEIGHTMAP = register(ResourceLocation.parse("debug/heightmap"));
     public static final ResourcedToggle DEBUG_COLLISION = register(ResourceLocation.parse("debug/collision"));
+    public static final ResourcedToggle DEBUG_SUPPORT_BLOCKS = register(ResourceLocation.parse("debug/support_blocks"));
     public static final ResourcedToggle DEBUG_LIGHT = register(ResourceLocation.parse("debug/light"));
     public static final ResourcedToggle DEBUG_SOLID_FACES = register(ResourceLocation.parse("debug/solid_faces"));
     public static final ResourcedToggle DEBUG_CHUNK = register(ResourceLocation.parse("debug/chunk"));
@@ -84,13 +85,10 @@ public class DebugToggles {
         PLAYER_ENABLED.remove(player.getUUID());
     }
 
-    public static void toggleAll(Collection<ServerPlayer> players, boolean updateOnly) {
+    public static void disableAll(Collection<ServerPlayer> players) {
         GETTER.values().forEach(t -> {
-            if (!t.get()) {
-                if (updateOnly)
-                    t.updateFor(players);
-                else
-                    t.toggleFor(players, false);
+            if (t.get()) {
+                t.toggleFor(players, false);
             }
         });
     }

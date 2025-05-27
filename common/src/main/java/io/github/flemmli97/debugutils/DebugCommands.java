@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -31,27 +32,29 @@ public class DebugCommands {
                                 .executes(DebugCommands::toggle)))
                 .then(Commands.literal("player").requires(src -> src.hasPermission(2))
                         .then(Commands.argument("module", ResourceLocationArgument.id()).suggests(DebugCommands::getToggles)
-                                .then(Commands.argument("on", BoolArgumentType.bool())
-                                        .executes(DebugCommands::toggleFor)))));
+                                .then(Commands.argument("players", EntityArgument.players())
+                                        .then(Commands.argument("on", BoolArgumentType.bool())
+                                                .executes(DebugCommands::toggleFor))))));
     }
 
     private static int toggleFor(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "player");
+        Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "players");
         boolean on = BoolArgumentType.getBool(context, "on");
         ResourceLocation id = ResourceLocationArgument.getId(context, "module");
         if (id.equals(DebugToggles.ALL)) {
-            DebugToggles.toggleAll(players, true);
-            context.getSource().sendSuccess(() -> Component.literal("Turned all debugging features off"), true);
+            DebugToggles.disableAll(players);
+            context.getSource().sendSuccess(() -> Component.translatable("debugutils.command.all.off"), true);
+            if (on)
+                context.getSource().sendSuccess(() -> Component.translatable("debugutils.command.all.on.note").withStyle(ChatFormatting.DARK_RED), true);
             return players.size();
         }
         DebugToggles.ResourcedToggle t = DebugToggles.get(id);
         if (t != null) {
             t.updateFor(players);
-            Component comp = Component.literal("Turned " + id + (on ? " on" : " off") + " for " + players.stream().map(p -> p.getGameProfile().getName()).toList());
-            context.getSource().sendSuccess(() -> comp, true);
+            context.getSource().sendSuccess(() -> Component.translatable("debugutils.command.toggle." + (on ? "on" : "off"), id.toString(), players.stream().map(p -> p.getGameProfile().getName()).toList().toString()), true);
             return players.size();
         }
-        context.getSource().sendFailure(Component.literal("No such toggle " + id));
+        context.getSource().sendFailure(Component.translatable("debugutils.command.toggle.none", id.toString()));
         return 0;
     }
 
@@ -61,18 +64,19 @@ public class DebugCommands {
         ResourceLocation id = ResourceLocationArgument.getId(context, "module");
         boolean on = BoolArgumentType.getBool(context, "on");
         if (id.equals(DebugToggles.ALL)) {
-            DebugToggles.toggleAll(players, false);
-            context.getSource().sendSuccess(() -> Component.literal("Turned all debugging features off"), true);
+            DebugToggles.disableAll(players);
+            context.getSource().sendSuccess(() -> Component.translatable("debugutils.command.all.off"), true);
+            if (on)
+                context.getSource().sendSuccess(() -> Component.translatable("debugutils.command.all.on.note").withStyle(ChatFormatting.DARK_RED), true);
             return players.size();
         }
         DebugToggles.ResourcedToggle t = DebugToggles.get(id);
         if (t != null) {
             t.toggleFor(players, on);
-            Component comp = Component.literal("Turned " + id + (on ? " on" : " off"));
-            context.getSource().sendSuccess(() -> comp, true);
+            context.getSource().sendSuccess(() -> Component.translatable("debugutils.command.toggle." + (on ? "on" : "off") + ".self", id.toString()), true);
             return players.size();
         }
-        context.getSource().sendFailure(Component.literal("No such toggle " + id));
+        context.getSource().sendFailure(Component.translatable("debugutils.command.toggle.none", id.toString()));
         return 0;
     }
 

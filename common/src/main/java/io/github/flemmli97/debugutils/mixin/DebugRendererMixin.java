@@ -4,16 +4,20 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.flemmli97.debugutils.client.AdditionalDebugRenderers;
 import io.github.flemmli97.debugutils.client.RenderBools;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.debug.BeeDebugRenderer;
 import net.minecraft.client.renderer.debug.BrainDebugRenderer;
 import net.minecraft.client.renderer.debug.BreezeDebugRenderer;
 import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.client.renderer.debug.GameEventListenerRenderer;
 import net.minecraft.client.renderer.debug.GoalSelectorDebugRenderer;
+import net.minecraft.client.renderer.debug.NeighborsUpdateRenderer;
 import net.minecraft.client.renderer.debug.PathfindingRenderer;
 import net.minecraft.client.renderer.debug.RaidDebugRenderer;
+import net.minecraft.client.renderer.debug.RedstoneWireOrientationsRenderer;
 import net.minecraft.client.renderer.debug.StructureRenderer;
 import net.minecraft.client.renderer.debug.VillageSectionsDebugRenderer;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,43 +27,80 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(DebugRenderer.class)
 public class DebugRendererMixin {
 
+    @Final
     @Shadow
-    private PathfindingRenderer pathfindingRenderer;
+    public PathfindingRenderer pathfindingRenderer;
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer waterDebugRenderer;
+    public DebugRenderer.SimpleDebugRenderer waterDebugRenderer;
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer heightMapRenderer;
+    public DebugRenderer.SimpleDebugRenderer heightMapRenderer;
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer collisionBoxRenderer;
+    public DebugRenderer.SimpleDebugRenderer collisionBoxRenderer;
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer neighborsUpdateRenderer;
+    public DebugRenderer.SimpleDebugRenderer supportBlockRenderer;
+    @Final
     @Shadow
-    private StructureRenderer structureRenderer;
+    public NeighborsUpdateRenderer neighborsUpdateRenderer;
+    /**
+     * Not too sure how to handle this.
+     * The packet is send via {@link net.minecraft.network.protocol.game.DebugPackets#sendWireUpdates}
+     * Assume a place to send it would be {@link net.minecraft.world.level.redstone.RedstoneWireEvaluator#updatePowerStrength} or
+     * {@link net.minecraft.world.level.block.RedStoneWireBlock#updatesOnShapeChange}
+     */
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer lightDebugRenderer;
+    public RedstoneWireOrientationsRenderer redstoneWireOrientationsRenderer;
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer worldGenAttemptRenderer; //Nothing for now cause there is no packet send for it
+    public StructureRenderer structureRenderer;
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer solidFaceRenderer;
+    public DebugRenderer.SimpleDebugRenderer lightDebugRenderer;
+    /**
+     * Missing packet impl.
+     * Relevant packet is {@link net.minecraft.network.protocol.common.custom.WorldGenAttemptDebugPayload}
+     */
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer chunkRenderer;
+    public DebugRenderer.SimpleDebugRenderer worldGenAttemptRenderer;
+    @Final
     @Shadow
-    private BrainDebugRenderer brainDebugRenderer;
+    public DebugRenderer.SimpleDebugRenderer solidFaceRenderer;
+    @Final
     @Shadow
-    private VillageSectionsDebugRenderer villageSectionsDebugRenderer;
+    public DebugRenderer.SimpleDebugRenderer chunkRenderer;
+    @Final
     @Shadow
-    private BeeDebugRenderer beeDebugRenderer;
+    public BrainDebugRenderer brainDebugRenderer;
+    /**
+     * Missing packet.
+     * Relevant packet is {@link net.minecraft.network.protocol.common.custom.VillageSectionsDebugPayload}
+     */
+    @Final
     @Shadow
-    private RaidDebugRenderer raidDebugRenderer;
+    public VillageSectionsDebugRenderer villageSectionsDebugRenderer;
+    @Final
     @Shadow
-    private GoalSelectorDebugRenderer goalSelectorRenderer;
+    public BeeDebugRenderer beeDebugRenderer;
+    @Final
     @Shadow
-    private GameEventListenerRenderer gameEventListenerRenderer;
+    public RaidDebugRenderer raidDebugRenderer;
+    @Final
     @Shadow
-    private BreezeDebugRenderer breezeDebugRenderer;
+    public GoalSelectorDebugRenderer goalSelectorRenderer;
+    @Final
+    @Shadow
+    public GameEventListenerRenderer gameEventListenerRenderer;
+    @Final
+    @Shadow
+    public BreezeDebugRenderer breezeDebugRenderer;
 
     @Inject(method = "render", at = @At("RETURN"))
-    private void doDebugRenderers(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, double camX, double camY, double camZ, CallbackInfo info) {
+    private void doDebugRenderers(PoseStack poseStack, Frustum frustum, MultiBufferSource.BufferSource bufferSource, double camX, double camY, double camZ, CallbackInfo info) {
         if (RenderBools.DEBUG_PATHS)
             this.pathfindingRenderer.render(poseStack, bufferSource, camX, camY, camZ);
         if (RenderBools.DEBUG_WATER)
@@ -68,6 +109,8 @@ public class DebugRendererMixin {
             this.heightMapRenderer.render(poseStack, bufferSource, camX, camY, camZ);
         if (RenderBools.DEBUG_COLLISION)
             this.collisionBoxRenderer.render(poseStack, bufferSource, camX, camY, camZ);
+        if (RenderBools.DEBUG_SUPPORT_BLOCKS)
+            this.supportBlockRenderer.render(poseStack, bufferSource, camX, camY, camZ);
         if (RenderBools.DEBUG_BLOCKUPDATES)
             this.neighborsUpdateRenderer.render(poseStack, bufferSource, camX, camY, camZ);
         if (RenderBools.DEBUG_STRUCTURES)

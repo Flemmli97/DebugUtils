@@ -1,3 +1,8 @@
+DebugUtils 1.0.7
+================
+- Update to 1.21.5
+- 
+
 DebugUtils 1.0.6.b
 ================
 - Fix fabric packets
