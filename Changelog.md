@@ -1,7 +1,9 @@
 DebugUtils 1.0.7
 ================
 - Update to 1.21.5
-- 
+- Fix disable all command
+- Use translation instead of hardcoded command feedback
+- Add `support_blocks` debug
 
 DebugUtils 1.0.6.b
 ================
