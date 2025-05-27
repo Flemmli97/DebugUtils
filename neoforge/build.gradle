@@ -1,1 +1,11 @@
 apply from: "https://raw.githubusercontent.com/Flemmli97/GradleScripts/arch-loom-v2/neoforge.gradle"
+
+loom {
+    runs {
+        data {
+            data()
+            programArgs "--all", "--mod", "debugutils"
+            programArgs "--output", project(":common").file("src/generated/resources").absolutePath
+        }
+    }
+}

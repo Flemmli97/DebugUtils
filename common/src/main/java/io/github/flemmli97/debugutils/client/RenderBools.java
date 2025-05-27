@@ -41,6 +41,7 @@ public class RenderBools {
         HANDLERS.put(ResourceLocation.parse("debug/water"), b -> DEBUG_WATER = b);
         HANDLERS.put(ResourceLocation.parse("debug/heightmap"), b -> DEBUG_HEIGHTMAP = b);
         HANDLERS.put(ResourceLocation.parse("debug/collision"), b -> DEBUG_COLLISION = b);
+        HANDLERS.put(ResourceLocation.parse("debug/support_blocks"), b -> DEBUG_SUPPORT_BLOCKS = b);
         HANDLERS.put(ResourceLocation.parse("debug/light"), b -> DEBUG_LIGHT = b);
         HANDLERS.put(ResourceLocation.parse("debug/solid_faces"), b -> DEBUG_SOLID_FACES = b);
         HANDLERS.put(ResourceLocation.parse("debug/chunk"), b -> DEBUG_CHUNK = b);
@@ -64,6 +65,7 @@ public class RenderBools {
     public static boolean DEBUG_WATER;
     public static boolean DEBUG_HEIGHTMAP;
     public static boolean DEBUG_COLLISION;
+    public static boolean DEBUG_SUPPORT_BLOCKS;
     public static boolean DEBUG_LIGHT;
     public static boolean DEBUG_SOLID_FACES;
     public static boolean DEBUG_CHUNK;

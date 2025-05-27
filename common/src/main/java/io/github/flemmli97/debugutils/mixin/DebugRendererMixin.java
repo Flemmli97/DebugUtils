@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.debug.PathfindingRenderer;
 import net.minecraft.client.renderer.debug.RaidDebugRenderer;
 import net.minecraft.client.renderer.debug.StructureRenderer;
 import net.minecraft.client.renderer.debug.VillageSectionsDebugRenderer;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,40 +24,60 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(DebugRenderer.class)
 public class DebugRendererMixin {
 
+    @Final
     @Shadow
-    private PathfindingRenderer pathfindingRenderer;
+    public PathfindingRenderer pathfindingRenderer;
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer waterDebugRenderer;
+    public DebugRenderer.SimpleDebugRenderer waterDebugRenderer;
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer heightMapRenderer;
+    public DebugRenderer.SimpleDebugRenderer heightMapRenderer;
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer collisionBoxRenderer;
+    public DebugRenderer.SimpleDebugRenderer collisionBoxRenderer;
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer neighborsUpdateRenderer;
+    public DebugRenderer.SimpleDebugRenderer supportBlockRenderer;
+    @Final
     @Shadow
-    private StructureRenderer structureRenderer;
+    public DebugRenderer.SimpleDebugRenderer neighborsUpdateRenderer;
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer lightDebugRenderer;
+    public StructureRenderer structureRenderer;
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer worldGenAttemptRenderer; //Nothing for now cause there is no packet send for it
+    public DebugRenderer.SimpleDebugRenderer lightDebugRenderer;
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer solidFaceRenderer;
+    public DebugRenderer.SimpleDebugRenderer worldGenAttemptRenderer; //Nothing for now cause there is no packet send for it
+    @Final
     @Shadow
-    private DebugRenderer.SimpleDebugRenderer chunkRenderer;
+    public DebugRenderer.SimpleDebugRenderer solidFaceRenderer;
+    @Final
     @Shadow
-    private BrainDebugRenderer brainDebugRenderer;
+    public DebugRenderer.SimpleDebugRenderer chunkRenderer;
+    @Final
     @Shadow
-    private VillageSectionsDebugRenderer villageSectionsDebugRenderer;
+    public BrainDebugRenderer brainDebugRenderer;
+    @Final
     @Shadow
-    private BeeDebugRenderer beeDebugRenderer;
+    public VillageSectionsDebugRenderer villageSectionsDebugRenderer;
+    @Final
     @Shadow
-    private RaidDebugRenderer raidDebugRenderer;
+    public BeeDebugRenderer beeDebugRenderer;
+    @Final
     @Shadow
-    private GoalSelectorDebugRenderer goalSelectorRenderer;
+    public RaidDebugRenderer raidDebugRenderer;
+    @Final
     @Shadow
-    private GameEventListenerRenderer gameEventListenerRenderer;
+    public GoalSelectorDebugRenderer goalSelectorRenderer;
+    @Final
     @Shadow
-    private BreezeDebugRenderer breezeDebugRenderer;
+    public GameEventListenerRenderer gameEventListenerRenderer;
+    @Final
+    @Shadow
+    public BreezeDebugRenderer breezeDebugRenderer;
 
     @Inject(method = "render", at = @At("RETURN"))
     private void doDebugRenderers(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, double camX, double camY, double camZ, CallbackInfo info) {
@@ -68,6 +89,8 @@ public class DebugRendererMixin {
             this.heightMapRenderer.render(poseStack, bufferSource, camX, camY, camZ);
         if (RenderBools.DEBUG_COLLISION)
             this.collisionBoxRenderer.render(poseStack, bufferSource, camX, camY, camZ);
+        if (RenderBools.DEBUG_SUPPORT_BLOCKS)
+            this.supportBlockRenderer.render(poseStack, bufferSource, camX, camY, camZ);
         if (RenderBools.DEBUG_BLOCKUPDATES)
             this.neighborsUpdateRenderer.render(poseStack, bufferSource, camX, camY, camZ);
         if (RenderBools.DEBUG_STRUCTURES)

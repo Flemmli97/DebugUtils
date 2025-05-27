@@ -1,0 +1,9 @@
+{
+  "debugutils.command.all.off": "Turned all debugging features off",
+  "debugutils.command.all.on.note": "Note: Turning all debuggings on at once is disabled for performance reasons",
+  "debugutils.command.toggle.on": "Turned %s on for %s",
+  "debugutils.command.toggle.off": "Turned %s off for %s",
+  "debugutils.command.toggle.on.self": "Turned %s on",
+  "debugutils.command.toggle.off.self": "Turned %s off",
+  "debugutils.command.toggle.none": "No such toggle %s"
+}
