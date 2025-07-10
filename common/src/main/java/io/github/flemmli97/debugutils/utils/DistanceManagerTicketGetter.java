@@ -9,5 +9,4 @@ public interface DistanceManagerTicketGetter {
     int debugUtils$getTicketLevel(TicketType<?> type, BlockPos pos);
 
     int debugUtils$getTicketLevel(TicketType<?> type, ChunkPos pos);
-
 }
