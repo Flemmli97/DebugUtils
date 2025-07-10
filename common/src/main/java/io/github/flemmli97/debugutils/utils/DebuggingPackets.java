@@ -134,7 +134,7 @@ public class DebuggingPackets {
     }
 
     public static void sendPathfindingPacket(Level level, Mob mob, @Nullable Path path, float maxDistanceToWaypoint) {
-        if (DebugToggles.DEBUG_PATHS.get() && !level.isClientSide && path != null) {
+        if (DebugToggles.DEBUG_PATHS.get() && !level.isClientSide && path != null && path.debugData() != null) {
             PathfindingDebugPayload packet = new PathfindingDebugPayload(mob.getId(), path, maxDistanceToWaypoint);
             sendToAll(packet, (ServerLevel) level, DebugToggles.DEBUG_PATHS);
         }
@@ -167,6 +167,8 @@ public class DebuggingPackets {
             Path path = null;
             if (brain.hasMemoryValue(MemoryModuleType.PATH)) {
                 path = brain.getMemory(MemoryModuleType.PATH).get();
+                if (path.debugData() == null)
+                    path = null;
             }
             boolean wantsGolem = false;
             int angerLevel = -1;
