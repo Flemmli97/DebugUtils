@@ -1,3 +1,8 @@
+DebugUtils 1.0.8
+================
+- Move the time where path debug info is set to support mods changing pathfinding more
+- Fix crash when path debug info is still not present
+
 DebugUtils 1.0.7
 ================
 - Fix disable all command
