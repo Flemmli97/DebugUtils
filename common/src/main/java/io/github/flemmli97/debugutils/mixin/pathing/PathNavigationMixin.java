@@ -19,7 +19,7 @@ public abstract class PathNavigationMixin {
 
     @ModifyExpressionValue(method = "createPath(Ljava/util/Set;IZIF)Lnet/minecraft/world/level/pathfinder/Path;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/pathfinder/PathFinder;findPath(Lnet/minecraft/world/level/PathNavigationRegion;Lnet/minecraft/world/entity/Mob;Ljava/util/Set;FIF)Lnet/minecraft/world/level/pathfinder/Path;"))
     private Path injectDebugData(Path original) {
-        Path.DebugData data = ((PathFindDebugData) this.pathFinder).getLastData();
+        Path.DebugData data = ((PathFindDebugData) this.pathFinder).debugutils$getLastData();
         if (data != null)
             ((PathAccessor) original).debugData(data.openSet(), data.closedSet(), data.targetNodes());
         return original;

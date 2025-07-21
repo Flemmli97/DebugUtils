@@ -4,5 +4,5 @@ import net.minecraft.world.level.pathfinder.Path;
 
 public interface PathFindDebugData {
 
-    Path.DebugData getLastData();
+    Path.DebugData debugutils$getLastData();
 }
