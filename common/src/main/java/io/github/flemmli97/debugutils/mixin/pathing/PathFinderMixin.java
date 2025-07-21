@@ -1,5 +1,6 @@
 package io.github.flemmli97.debugutils.mixin.pathing;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import io.github.flemmli97.debugutils.DebugToggles;
 import io.github.flemmli97.debugutils.utils.PathFindDebugData;
 import net.minecraft.core.BlockPos;
@@ -18,6 +19,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,7 +35,12 @@ public abstract class PathFinderMixin implements PathFindDebugData {
     @Final
     @Shadow
     private BinaryHeap openSet;
+    @Shadow
+    @Final
+    private Node[] neighbors;
 
+    @Unique
+    private final Set<Node> debugutils$closedSet = new HashSet<>();
     @Unique
     private Path.DebugData debugutils$lastData;
 
@@ -40,16 +50,32 @@ public abstract class PathFinderMixin implements PathFindDebugData {
         this.debugutils$lastData = null;
     }
 
+    @ModifyExpressionValue(method = "findPath(Lnet/minecraft/world/level/pathfinder/Node;Ljava/util/Map;FIF)Lnet/minecraft/world/level/pathfinder/Path;",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/pathfinder/NodeEvaluator;getNeighbors([Lnet/minecraft/world/level/pathfinder/Node;Lnet/minecraft/world/level/pathfinder/Node;)I"))
+    private int cacheNodes(int amount) {
+        if (DebugToggles.DEBUG_PATHS.get()) {
+            // Dont think there is a better way to do this
+            this.debugutils$closedSet.addAll(Arrays.asList(this.neighbors).subList(0, amount));
+        }
+        return amount;
+    }
+
     @Inject(method = "findPath(Lnet/minecraft/world/level/pathfinder/Node;Ljava/util/Map;FIF)Lnet/minecraft/world/level/pathfinder/Path;",
             at = @At("TAIL"))
     private void setPathDebugs(Node node, Map<Target, BlockPos> targetPos, float maxRange, int accuracy, float searchDepthMultiplier, CallbackInfoReturnable<Path> info) {
         if (DebugToggles.DEBUG_PATHS.get()) {
-            this.debugutils$lastData = new Path.DebugData(this.openSet.getHeap(), new Node[0], targetPos.keySet());
+            List<Node> closed = new ArrayList<>();
+            for (Node check : this.debugutils$closedSet) {
+                if (!check.inOpenSet())
+                    closed.add(check);
+            }
+            this.debugutils$closedSet.clear();
+            this.debugutils$lastData = new Path.DebugData(this.openSet.getHeap(), closed.toArray(Node[]::new), targetPos.keySet());
         }
     }
 
     @Override
-    public Path.DebugData getLastData() {
+    public Path.DebugData debugutils$getLastData() {
         return this.debugutils$lastData;
     }
 }

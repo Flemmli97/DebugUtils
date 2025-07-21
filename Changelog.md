@@ -1,3 +1,7 @@
+DebugUtils 1.0.9
+================
+- Add closed set debugging to path debug
+
 DebugUtils 1.0.8
 ================
 - Move the time where path debug info is set to support mods changing pathfinding more
