@@ -6,7 +6,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-@EventBusSubscriber(modid = DebugUtils.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = DebugUtils.MODID)
 public class DataEvent {
 
     @SubscribeEvent

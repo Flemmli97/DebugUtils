@@ -67,7 +67,7 @@ public class SpawnChunkRenderer implements DebugRenderer.SimpleDebugRenderer {
                 quads, 20 / 255f, 170 / 255f, 10 / 255f, deferredLines);
 
         source.endBatch();
-        VertexConsumer lines = source.getBuffer(RenderType.debugLine(3));
+        VertexConsumer lines = source.getBuffer(RenderType.lines());
         deferredLines.forEach(c -> c.accept(lines));
         source.endBatch();
     }
