@@ -1,6 +1,7 @@
 DebugUtils 1.0.9
 ================
-- Add closed set debugging to path debug
+- Update 1.21.8
+~~- Add closed set debugging to path debug~~
 
 DebugUtils 1.0.8
 ================
