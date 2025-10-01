@@ -26,15 +26,15 @@ public class DebugUtils {
             i++;
         }
         if (clss == null)
-            LOGGER.fatal("No Implementation of " + abstractClss + " found with given paths " + Arrays.toString(impls));
+            LOGGER.fatal("No Implementation of {} found with given paths {}", abstractClss, Arrays.toString(impls));
         else if (abstractClss.isAssignableFrom(clss)) {
             try {
                 Constructor<T> constructor = (Constructor<T>) clss.getDeclaredConstructor();
                 return constructor.newInstance();
             } catch (NoSuchMethodException e) {
-                LOGGER.fatal("Implementation of " + clss + " needs to provide an no arg constructor");
+                LOGGER.fatal("Implementation of {} needs to provide an no arg constructor", clss);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+                LOGGER.fatal(e);
             }
         }
         throw new IllegalStateException("Couldn't create an instance of " + abstractClss);

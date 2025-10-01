@@ -34,7 +34,8 @@ public class Lang implements DataProvider {
     }
 
     protected void addTranslations() {
-        this.add("debugutils.command.all.off", "Turned all debugging features off");
+        this.add("debugutils.command.all.off", "Turned all debugging features off for %s");
+        this.add("debugutils.command.all.off.self", "Turned all debugging features off");
         this.add("debugutils.command.all.on.note", "Note: Turning all debuggings on at once is disabled for performance reasons");
         this.add("debugutils.command.toggle.on", "Turned %s on for %s");
         this.add("debugutils.command.toggle.off", "Turned %s off for %s");

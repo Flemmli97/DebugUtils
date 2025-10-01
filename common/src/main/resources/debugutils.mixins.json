@@ -4,14 +4,10 @@
   "package": "io.github.flemmli97.debugutils.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "pathing.PathAccessor",
-    "pathing.PathFinderMixin",
-    "pathing.PathNavigationMixin",
-    "DebugPacketsMixin",
-    "DistanceManagerMixin",
-    "ServerLevelMixin"
+    "ServerPlayerMixin"
   ],
   "client": [
+    "ClientDebugSubscriberMixin",
     "DebugRendererMixin"
   ],
   "injectors": {
