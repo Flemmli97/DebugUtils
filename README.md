@@ -1,5 +1,5 @@
 # Debug Utils 
-[![](http://cf.way2muchnoise.eu/full_783008_Forge_%20.svg)![](http://cf.way2muchnoise.eu/versions/783008.svg)](https://www.curseforge.com/minecraft/mc-mods/debug-utils-forge)  
+[![](http://cf.way2muchnoise.eu/full_783008_Forge_%20.svg)![](http://cf.way2muchnoise.eu/versions/783008.svg)](https://www.curseforge.com/minecraft/mc-mods/debug-utils)  
 [![](http://cf.way2muchnoise.eu/full_783010_Fabric_%20.svg)![](http://cf.way2muchnoise.eu/versions/783010.svg)](https://www.curseforge.com/minecraft/mc-mods/debug-utils-fabric)   
 [![](https://img.shields.io/modrinth/dt/orux8o94?logo=modrinth&label=Modrinth)![](https://img.shields.io/modrinth/game-versions/orux8o94?logo=modrinth&label=Latest%20for)](https://modrinth.com/mod/debugutils)  
 [![Discord](https://img.shields.io/discord/790631506313478155?color=0a48c4&label=discord)](https://discord.gg/8Cx26tfWNs)
