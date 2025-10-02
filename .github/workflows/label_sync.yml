@@ -2,6 +2,9 @@ name: Sync Labels
 on:
   workflow_dispatch:
 
+permissions:
+  issues: write
+
 jobs:
   labels:
     runs-on: ubuntu-latest
