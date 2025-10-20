@@ -1,11 +1,19 @@
-apply from: "https://raw.githubusercontent.com/Flemmli97/GradleScripts/arch-loom-v2/neoforge.gradle"
+plugins {
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
+    id 'com.modrinth.minotaur' version '2.+'
+    id 'io.github.flemmli97.multiloader.platform-neoforge'
+}
 
-loom {
+neoForge {
     runs {
+        var common = project(":common")
         data {
-            clientData()
-            programArgs "--all", "--mod", "debugutils"
-            programArgs "--output", project(":common").file("src/generated/resources").absolutePath
+            serverData()
+            programArguments.addAll "--all", "--mod", "debugutils"
+            programArguments.addAll "--output", common.file("src/generated/resources").absolutePath
+        }
+        client {
+            jvmArgument "-XX:+AllowEnhancedClassRedefinition"
         }
     }
 }
