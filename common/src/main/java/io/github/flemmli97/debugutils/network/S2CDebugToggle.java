@@ -7,14 +7,14 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.debug.DebugSubscription;
 
 import java.util.List;
 
 public record S2CDebugToggle(List<DebugSubscription<?>> toggles, boolean on) implements CustomPacketPayload {
 
-    public static final Type<S2CDebugToggle> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(DebugUtils.MODID, "s2c_debug_toggle"));
+    public static final Type<S2CDebugToggle> TYPE = new Type<>(Identifier.fromNamespaceAndPath(DebugUtils.MODID, "s2c_debug_toggle"));
     public static final StreamCodec<RegistryFriendlyByteBuf, S2CDebugToggle> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public S2CDebugToggle decode(RegistryFriendlyByteBuf buf) {

@@ -17,10 +17,7 @@ public class DebugRendererMixin implements DebugRendererModifier {
 
     @Shadow
     @Final
-    private List<DebugRenderer.SimpleDebugRenderer> opaqueRenderers;
-    @Shadow
-    @Final
-    private List<DebugRenderer.SimpleDebugRenderer> translucentRenderers;
+    private List<DebugRenderer.SimpleDebugRenderer> renderers;
 
     @Inject(method = "refreshRendererList", at = @At("RETURN"))
     private void doDebugRenderers(CallbackInfo ci) {
@@ -28,23 +25,13 @@ public class DebugRendererMixin implements DebugRendererModifier {
     }
 
     @Override
-    public void debugutils$update(DebugRenderer.SimpleDebugRenderer renderer, boolean add, boolean transparent) {
-        if (transparent) {
-            if (add) {
-                if (!this.translucentRenderers.contains(renderer)) {
-                    this.translucentRenderers.add(renderer);
-                }
-            } else {
-                this.translucentRenderers.remove(renderer);
+    public void debugutils$update(DebugRenderer.SimpleDebugRenderer renderer, boolean add) {
+        if (add) {
+            if (!this.renderers.contains(renderer)) {
+                this.renderers.add(renderer);
             }
         } else {
-            if (add) {
-                if (!this.opaqueRenderers.contains(renderer)) {
-                    this.opaqueRenderers.add(renderer);
-                }
-            } else {
-                this.opaqueRenderers.remove(renderer);
-            }
+            this.renderers.remove(renderer);
         }
     }
 }

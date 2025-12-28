@@ -1,9 +1,9 @@
 package io.github.flemmli97.debugutils.api;
 
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.debug.ChunkCullingDebugRenderer;
 import net.minecraft.client.renderer.debug.DebugRenderer;
+import net.minecraft.util.Util;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;

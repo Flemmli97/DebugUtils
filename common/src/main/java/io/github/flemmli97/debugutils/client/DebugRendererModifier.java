@@ -4,5 +4,5 @@ import net.minecraft.client.renderer.debug.DebugRenderer;
 
 public interface DebugRendererModifier {
 
-    void debugutils$update(DebugRenderer.SimpleDebugRenderer renderer, boolean add, boolean transparent);
+    void debugutils$update(DebugRenderer.SimpleDebugRenderer renderer, boolean add);
 }

@@ -15,6 +15,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.util.debug.DebugSubscription;
 
 import java.util.Collection;
@@ -24,10 +25,10 @@ public class DebugCommands {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext) {
         dispatcher.register(Commands.literal(DebugUtils.MODID)
-                .then(Commands.argument("module", ResourceArgument.resource(buildContext, Registries.DEBUG_SUBSCRIPTION)).requires(src -> src.hasPermission(2))
+                .then(Commands.argument("module", ResourceArgument.resource(buildContext, Registries.DEBUG_SUBSCRIPTION)).requires(src -> src.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
                         .then(Commands.argument("on", BoolArgumentType.bool())
                                 .executes(DebugCommands::toggle)))
-                .then(Commands.literal("player").requires(src -> src.hasPermission(2))
+                .then(Commands.literal("player").requires(src -> src.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
                         .then(Commands.argument("module", ResourceArgument.resource(buildContext, Registries.DEBUG_SUBSCRIPTION))
                                 .then(Commands.argument("players", EntityArgument.players())
                                         .then(Commands.argument("on", BoolArgumentType.bool())
@@ -52,11 +53,11 @@ public class DebugCommands {
         if (players.size() == 1 && players.stream().findFirst().map(p -> p.equals(sender)).orElse(false)) {
             key[0] += ".self";
         }
-        context.getSource().sendSuccess(() -> Component.translatable(key[0], value.key().location().toString(), players.stream().map(p -> p.getGameProfile().name()).toList().toString()), true);
+        context.getSource().sendSuccess(() -> Component.translatable(key[0], value.key().identifier().toString(), players.stream().map(p -> p.getGameProfile().name()).toList().toString()), true);
         return players.size();
     }
 
-    private static int toggleOff(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    private static int toggleOff(CommandContext<CommandSourceStack> context) {
         return toggleOffFor(context, context.getSource().getEntity() instanceof ServerPlayer serverPlayer ? List.of(serverPlayer) : List.of());
     }
 
