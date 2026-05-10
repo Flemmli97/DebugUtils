@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[${loader_version},)"
+loaderVersion = "[${neoforge_loader_version},)"
 license="GNU LGPLv3"
 issueTrackerURL="https://github.com/Flemmli97/DebugUtils/issues"
 [[mixins]]
@@ -15,6 +15,6 @@ description='''Enables various debugging tools from mojang'''
 [[dependencies.debugutils]]
 modId="minecraft"
 type="required"
-versionRange="[${mcversion},)"
+versionRange = "[${minecraft_version},)"
 ordering="NONE"
 side="BOTH"

@@ -24,7 +24,7 @@
     "debugutils.mixins.json"
   ],
   "depends": {
-    "fabric": ">=${fabric_version}",
-    "minecraft": ">=${mcversion}"
+    "fabric-api": ">=${fabric_api_version}",
+    "minecraft": ">=${minecraft_version}"
   }
 }
