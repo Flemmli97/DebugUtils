@@ -17,7 +17,7 @@ public class DebugUtilsFabric implements ModInitializer {
     }
 
     public static void registerPackets() {
-        PayloadTypeRegistry.playS2C().register(S2CDebugToggle.TYPE, S2CDebugToggle.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(S2CDebugToggle.TYPE, S2CDebugToggle.STREAM_CODEC);
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             ClientPlayNetworking.registerGlobalReceiver(S2CDebugToggle.TYPE, (pkt, ctx) -> S2CDebugToggle.handle(pkt));
         }
