@@ -7,7 +7,7 @@ modId="debugutils"
 version="${version}"
 displayName="Debug Utils"
 displayURL = "${homepage_neoforge}"
-logoFile="icon.png"
+iconFile = "icon.png"
 authors="Flemmli97"
 description='''Enables various debugging tools from mojang'''
 [[dependencies.debugutils]]

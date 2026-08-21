@@ -1,7 +1,7 @@
 DebugUtils 1.0.9
 ================
-- Update to 1.21.11
-- Removed `debugutils_client` command as vanilla now allows configuring them in game
+- Update to 26.2  
+~~- Removed `debugutils_client` command as vanilla now allows configuring them in game~~
 ~~- Update to 1.21.9~~
 ~~- Update 1.21.8~~
 ~~- Add closed set debugging to path debug~~

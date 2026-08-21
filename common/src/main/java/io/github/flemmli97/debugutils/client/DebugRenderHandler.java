@@ -87,7 +87,7 @@ public class DebugRenderHandler {
             ENABLED_SUBSCRIPTION.remove(subscription);
         }
         if (!holder.alreadyEnabled().getAsBoolean()) {
-            ((DebugRendererModifier) Minecraft.getInstance().levelRenderer.debugRenderer)
+            ((DebugRendererModifier) Minecraft.getInstance().levelExtractor.debugRenderer)
                     .debugutils$update(holder.factory().apply(Minecraft.getInstance()), enabled);
         }
     }
